@@ -11,4 +11,6 @@
 *.a
 *.exe
 
+allegro.log
+
 
