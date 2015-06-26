@@ -1,0 +1,14 @@
+
+
+*.swp
+*.swo
+*.tmp
+
+*.dll
+
+*.obj
+*.o
+*.a
+*.exe
+
+
