@@ -5,20 +5,28 @@
 #include <allegro5/allegro_primitives.h>
 #include <allegro5/allegro_ttf.h>
 
+#include <string>
+#include <vector>
+
+#include "park_assets.h"
+#include "park.h"
 
 class Project
 {
 public:
 	ALLEGRO_DISPLAY *display;
+	Park park;
 	bool abort_game;
 	Project(ALLEGRO_DISPLAY *display)
 		: display(display)
+		, park()
 		, abort_game(false)
 	{}
 	void on_timer()
 	{
 		al_clear_to_color(al_color_name("gray"));
-		al_draw_filled_circle(al_get_display_width(display)/2, al_get_display_height(display)/2, 10, al_color_name("white"));
+
+		park.draw();
 	}
 	void on_key_char() {}
 	void on_key_up() {}
