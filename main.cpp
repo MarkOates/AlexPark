@@ -8,7 +8,7 @@
 #include <string>
 #include <vector>
 
-#include "park_assets.h"
+#include "park_asset.h"
 #include "heat_map.h"
 #include "park.h"
 
