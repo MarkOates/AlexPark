@@ -114,8 +114,6 @@ public:
 
 		al_use_transform(al_get_current_transform());
 		al_set_render_state(ALLEGRO_DEPTH_TEST, 1);
-		al_clear_to_color(al_color_name("gray"));
-		al_clear_depth_buffer(1000);
 	}
 };
 
@@ -133,6 +131,8 @@ public:
 	ParkAsset park_assets[6];
 	Ground ground;
 
+	int mouse_x, mouse_y;
+
 	Project(ALLEGRO_DISPLAY *display)
 		: display(display)
 		, pointer_target_buffer(al_create_bitmap(al_get_display_width(display), al_get_display_height(display)))
@@ -141,6 +141,8 @@ public:
 		, abort_game(false)
 		, texture(al_load_bitmap("data/bitmaps/stone.png"))
 		, ground(32, 32, al_load_bitmap("data/bitmaps/ground_texture.png"))
+		, mouse_x(0)
+		, mouse_y(0)
 	{
 		for (unsigned i=0; i<6; i++)
 		{
@@ -148,16 +150,44 @@ public:
 			park_assets[i].position.x = i*2;
 		}
 	}
+	ParkAsset *get_asset_by_id(int id)
+	{
+		for (unsigned i=0; i<6; i++)
+			if (park_assets[i].id == id) return &park_assets[i];
+		return NULL;
+	}
 	void on_timer()
 	{
-		//	set_perspective_transform(al_get_backbuffer(display));
-		//camera.set_frustum_as_camera(display);
+		//
+		// this draws the ids as colors into a buffer
+		//
+
+		camera.setup_camera_perspective(pointer_target_buffer);
+		al_clear_to_color(al_color_name("black"));
+		al_clear_depth_buffer(1000);
+
+		for (unsigned i=0; i<6; i++)
+			park_assets[i].draw(true);
+
+		// set the current hovered_asset_id
+		int hovered_asset_id = decode_id(al_get_pixel(pointer_target_buffer, mouse_x, mouse_y));
+		std::cout << hovered_asset_id << " ";
+
+		//
+		// this draws the actual scene
+		//
+
 		camera.setup_camera_perspective(al_get_backbuffer(display));
+		al_clear_to_color(al_color_name("gray"));
+		al_clear_depth_buffer(1000);
 
 		ground.draw();
 
 		for (unsigned i=0; i<6; i++)
+		{
+			park_assets[i].hovered = (park_assets[i].id == hovered_asset_id);
 			park_assets[i].draw();
+		}
 	}
 	void on_key_char(ALLEGRO_EVENT &ev)
 	{
@@ -181,11 +211,18 @@ public:
 			case ALLEGRO_KEY_PAD_MINUS:
 				camera.zoom_pos -= 0.1;
 				break;
+			case ALLEGRO_KEY_ENTER:
+				al_save_bitmap("pointer_buffer.bmp", pointer_target_buffer);
+				break;
 		}
 	}
 	void on_key_up() {}
 	void on_key_down() {}
-	void on_mouse_axes() {}
+	void on_mouse_axes(ALLEGRO_EVENT &ev)
+	{
+		mouse_x = ev.mouse.x;
+		mouse_y = ev.mouse.y;
+	}
 	void on_mouse_up() {}
 	void on_mouse_down() {}
 };
@@ -212,6 +249,7 @@ int main(int argc, char* argv[])
 
 	// create the display
 	al_set_new_display_option(ALLEGRO_DEPTH_SIZE, 32, ALLEGRO_SUGGEST);
+	al_set_new_display_option(ALLEGRO_SUPPORT_NPOT_BITMAP, 0, ALLEGRO_REQUIRE);
 	ALLEGRO_DISPLAY *display = al_create_display(800, 600);
 
 	al_register_event_source(event_queue, al_get_timer_event_source(timer));
@@ -249,7 +287,7 @@ int main(int argc, char* argv[])
 			project.on_mouse_up();
 			break;
 		case ALLEGRO_EVENT_MOUSE_AXES:
-			project.on_mouse_axes();
+			project.on_mouse_axes(current_event);
 			break;
 		case ALLEGRO_EVENT_DISPLAY_CLOSE:
 			project.abort_game = true;
