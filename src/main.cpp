@@ -23,6 +23,8 @@
 
 
 
+
+
 class Project
 {
 public:
@@ -30,6 +32,7 @@ public:
 	ALLEGRO_BITMAP *pointer_target_buffer;
 	Camera camera;
 	Park park;
+	HUD hud;
 	bool abort_game;
 
 	ALLEGRO_BITMAP *texture;
@@ -43,6 +46,7 @@ public:
 		, pointer_target_buffer(al_create_bitmap(al_get_display_width(display), al_get_display_height(display)))
 		, camera(0, 0, 0)
 		, park()
+		, hud(display, &park)
 		, abort_game(false)
 		, texture(al_load_bitmap("data/bitmaps/stone.png"))
 		, ground(32, 32, al_load_bitmap("data/bitmaps/ground_texture.png"))
@@ -104,6 +108,8 @@ public:
 			park_assets[i].hovered = (park_assets[i].id == hovered_asset_id);
 			park_assets[i].draw();
 		}
+
+		hud.draw();
 	}
 	void on_key_char(ALLEGRO_EVENT &ev)
 	{
