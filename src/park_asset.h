@@ -125,7 +125,7 @@ public:
 			0, 4, 1
 		};
 
-		for (unsigned i=0; i<8; i++)
+		for (unsigned i=0; i<5; i++)
 		{
 			vtx[i].x += 0.5;
 			vtx[i].z += 0.5;
