@@ -1,6 +1,8 @@
 
 
 
+
+
 class Park
 {
 public:
@@ -24,14 +26,22 @@ public:
 
 	void update()
 	{
+		
 	}
 
-	void draw()
+	ParkAsset *get_asset_by_id(int id)
 	{
 		for (unsigned i=0; i<assets.size(); i++)
-			assets[i]->draw();
+			if (assets[i]->id == id) return assets[i];
+		return NULL;
+	}
 
-		traffic_map.draw();
+	void draw(bool use_id=false)
+	{
+		for (unsigned i=0; i<assets.size(); i++)
+			assets[i]->draw_cube(use_id);
+
+		//traffic_map.draw();
 	}
 };
 

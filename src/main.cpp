@@ -36,7 +36,7 @@ public:
 	bool abort_game;
 
 	ALLEGRO_BITMAP *texture;
-	ParkAsset park_assets[6];
+	//ParkAsset park_assets[6];
 	Ground ground;
 
 	int mouse_x, mouse_y;
@@ -55,15 +55,11 @@ public:
 	{
 		for (unsigned i=0; i<6; i++)
 		{
-			park_assets[i].set_texture(texture);
-			park_assets[i].position.x = i*2;
+			park.assets.push_back(new ParkAsset());
+			park.assets[i]->set_texture(texture);
+			park.assets[i]->position.x = i*2;
+			std::cout << i << " " << park.assets[i]->id << std::endl;
 		}
-	}
-	ParkAsset *get_asset_by_id(int id)
-	{
-		for (unsigned i=0; i<6; i++)
-			if (park_assets[i].id == id) return &park_assets[i];
-		return NULL;
 	}
 	void on_timer()
 	{
@@ -75,17 +71,20 @@ public:
 		al_clear_to_color(al_color_name("black"));
 		al_clear_depth_buffer(1000);
 
-		for (unsigned i=0; i<6; i++)
-			park_assets[i].draw_cube(true);
-
 		ground.fit_and_use_texture(ground.remap_coordinates_texture);
 		ground.draw(true);
+
+		park.draw(true);
+
+
+		//
+		// parse the asset data and retrieve the useful information
+		//
 
 		// set the current hovered_asset_id
 		ALLEGRO_COLOR pointed_pixel_value = al_get_pixel(pointer_target_buffer, mouse_x, mouse_y);
 		int hovered_asset_id = decode_id(pointed_pixel_value);
 
-		// for now, lets just the square blue that's being pointed to
 		if (hovered_asset_id >= 1000)
 		{
 			int x, y;
@@ -93,6 +92,11 @@ public:
 			//al_set_target_bitmap(ground.texture);
 			//al_put_pixel(x, y, al_color_name("dodgerblue"));
 		}
+
+		// set the park asset as "hovered"
+		for (unsigned i=0; i<park.assets.size(); i++)
+			park.assets[i]->hovered = (park.assets[i]->id == hovered_asset_id);
+
 
 		//
 		// this draws the actual scene
@@ -105,11 +109,7 @@ public:
 		ground.fit_and_use_texture(ground.texture);
 		ground.draw();
 
-		for (unsigned i=0; i<6; i++)
-		{
-			park_assets[i].hovered = (park_assets[i].id == hovered_asset_id);
-			park_assets[i].draw_cube();
-		}
+		park.draw();	
 
 		hud.draw();
 	}
