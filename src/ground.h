@@ -8,10 +8,10 @@ public:
 	ALLEGRO_BITMAP *texture, *remap_coordinates_texture;
 	ALLEGRO_VERTEX vertexes[4];
 
-	Ground(int w, int h, ALLEGRO_BITMAP *tex)
+	Ground(int w, int h, ALLEGRO_BITMAP *surface_texture)
 		: w(w)
 		, h(h)
-		, texture(tex)
+		, texture(surface_texture)
 		, remap_coordinates_texture(create_remapable_texture(w, h, 1000))
 		, vertexes({
 				{-w/2.0f, 0, -h/2.0f, 0, 0, al_color_name("white")},
@@ -20,6 +20,24 @@ public:
 				{w/2.0f, 0, -h/2.0f, (float)w, 0, al_color_name("white")}
 		})
 	{
+	}
+
+	void fit_and_use_texture(ALLEGRO_BITMAP *bmp, int tile_n_times=8)
+	{
+		int w = al_get_bitmap_width(bmp);
+		int h = al_get_bitmap_height(bmp);
+
+		vertexes[0].u = 0;
+		vertexes[0].v = 0;
+
+		vertexes[1].u = 0;
+		vertexes[1].v = h*tile_n_times;
+
+		vertexes[2].u = w*tile_n_times;
+		vertexes[2].v = h*tile_n_times;
+
+		vertexes[3].u = w*tile_n_times;
+		vertexes[3].v = 0; 
 	}
 
 	ALLEGRO_BITMAP *create_remapable_texture(int width, int height, int offset_number)

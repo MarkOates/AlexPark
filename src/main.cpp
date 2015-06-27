@@ -49,7 +49,7 @@ public:
 		, hud(display, &park)
 		, abort_game(false)
 		, texture(al_load_bitmap("data/bitmaps/stone.png"))
-		, ground(32, 32, al_load_bitmap("data/bitmaps/ground_texture.png"))
+		, ground(32, 32, al_load_bitmap("data/bitmaps/grass_256.png"))
 		, mouse_x(0)
 		, mouse_y(0)
 	{
@@ -78,6 +78,7 @@ public:
 		for (unsigned i=0; i<6; i++)
 			park_assets[i].draw(true);
 
+		ground.fit_and_use_texture(ground.remap_coordinates_texture);
 		ground.draw(true);
 
 		// set the current hovered_asset_id
@@ -89,8 +90,8 @@ public:
 		{
 			int x, y;
 			ground.unmap_texture_coordinates(hovered_asset_id, 1000, &x, &y);
-			al_set_target_bitmap(ground.texture);
-			al_put_pixel(x, y, al_color_name("dodgerblue"));
+			//al_set_target_bitmap(ground.texture);
+			//al_put_pixel(x, y, al_color_name("dodgerblue"));
 		}
 
 		//
@@ -101,6 +102,7 @@ public:
 		al_clear_to_color(al_color_name("gray"));
 		al_clear_depth_buffer(1000);
 
+		ground.fit_and_use_texture(ground.texture);
 		ground.draw();
 
 		for (unsigned i=0; i<6; i++)
