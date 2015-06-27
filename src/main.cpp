@@ -15,7 +15,6 @@
 #include "park.h"
 #include "vec3d.h"
 
-
 #define TAU (ALLEGRO_PI * 2)
 
 
@@ -95,11 +94,18 @@ public:
 	vec3d rotation;
 	float tilt;
 
+	float zoom_min;
+	float zoom_max;
+	float zoom_pos;
+
 	Camera(float x, float y, float z)
 		: position(x, y, z)
 		, stepback(0, 0, 0)
 		, rotation(0, 0, 0)
 		, tilt(0)
+		, zoom_min(10)
+		, zoom_max(4)
+		, zoom_pos(0.5)
 	{
 		set45_isometric();
 	}
@@ -135,7 +141,8 @@ public:
 
 		//al_perspective_transform(&p, -1, aspect_ratio, 1, 1, -aspect_ratio, 1000);
 		float znear = 100;
-		stepback = vec3d(0, znear*10, znear*10);
+		float zoom = (zoom_max - zoom_min) * zoom_pos + zoom_min; // 4 is closeup, 10 is wide
+		stepback = vec3d(0, znear*zoom, znear*zoom);
 		al_perspective_transform(&p,
 			-1, aspect_ratio, znear,
 			1, -aspect_ratio, 10000);
@@ -182,7 +189,30 @@ public:
 		for (unsigned i=0; i<6; i++)
 			models[i].draw();
 	}
-	void on_key_char() {}
+	void on_key_char(ALLEGRO_EVENT &ev)
+	{
+		switch(ev.keyboard.keycode)
+		{
+			case ALLEGRO_KEY_RIGHT:
+				camera.position.x ++;
+				break;
+			case ALLEGRO_KEY_LEFT:
+				camera.position.x --;
+				break;
+			case ALLEGRO_KEY_UP:
+				camera.position.z--;
+				break;
+			case ALLEGRO_KEY_DOWN:
+				camera.position.z++;
+				break;
+			case ALLEGRO_KEY_PAD_PLUS:
+				camera.zoom_pos += 0.1;
+				break;
+			case ALLEGRO_KEY_PAD_MINUS:
+				camera.zoom_pos -= 0.1;
+				break;
+		}
+	}
 	void on_key_up() {}
 	void on_key_down() {}
 	void on_mouse_axes() {}
@@ -236,7 +266,7 @@ int main(int argc, char* argv[])
 			al_flip_display();
 			break;
 		case ALLEGRO_EVENT_KEY_CHAR:
-			project.on_key_char();
+			project.on_key_char(current_event);
 			break;
 		case ALLEGRO_EVENT_KEY_DOWN:
 			project.on_key_down();
