@@ -11,10 +11,10 @@
 #include <iostream>
 
 #include "color_encode_id.h"
+#include "vec3d.h"
 #include "park_asset.h"
 #include "heat_map.h"
 #include "park.h"
-#include "vec3d.h"
 
 #define TAU (ALLEGRO_PI * 2)
 
@@ -46,62 +46,7 @@ public:
 	{
 		al_draw_prim(&vertexes, NULL, texture, 0, 4, ALLEGRO_PRIM_TRIANGLE_FAN);
 	}
-};
 
-
-
-
-class Model
-{
-public:
-	std::vector<ALLEGRO_VERTEX> vertexes;
-	std::vector<int> indexes;
-	ALLEGRO_TRANSFORM transform;
-
-	vec3d position;
-	float rotation_y;
-	ALLEGRO_BITMAP *texture;
-
-	Model()
-		: vertexes()
-		, indexes()
-		, transform()
-		, position(0, 0, 0)
-		, rotation_y(0)
-		, texture(NULL)
-	{
-	}
-
-	void set_texture(ALLEGRO_BITMAP *tx)
-	{
-		texture = tx;
-	}
-
-	void draw()
-	{
-		ALLEGRO_COLOR c = al_map_rgb_f(1, 1, 1);
-		ALLEGRO_TRANSFORM t;
-		ALLEGRO_VERTEX vtx[5] = {
-		/*   x   y   z   u   v  c  */
-			{ 0,  1,  0,  0, 64, c},
-			{-0.5, 0, -0.5,  0,  0, c},
-			{ 0.5, 0, -0.5, 64, 64, c},
-			{ 0.5, 0,  0.5, 64,  0, c},
-			{-0.5, 0,  0.5, 64, 64, c},
-		};
-		int indices[12] = {
-			0, 1, 2,
-			0, 2, 3,
-			0, 3, 4,
-			0, 4, 1
-		};
-
-		al_identity_transform(&t);
-		al_rotate_transform_3d(&t, 0, 1, 0, rotation_y);
-		al_translate_transform_3d(&t, position.x, position.y, position.z);
-		al_use_transform(&t);
-		al_draw_indexed_prim(vtx, NULL, texture, indices, 12, ALLEGRO_PRIM_TRIANGLE_LIST);
-	}
 };
 
 
@@ -185,7 +130,7 @@ public:
 	bool abort_game;
 
 	ALLEGRO_BITMAP *texture;
-	Model models[6];
+	ParkAsset park_assets[6];
 	Ground ground;
 
 	Project(ALLEGRO_DISPLAY *display)
@@ -199,8 +144,8 @@ public:
 	{
 		for (unsigned i=0; i<6; i++)
 		{
-			models[i].set_texture(texture);
-			models[i].position.x = i*2;
+			park_assets[i].set_texture(texture);
+			park_assets[i].position.x = i*2;
 		}
 	}
 	void on_timer()
@@ -212,7 +157,7 @@ public:
 		ground.draw();
 
 		for (unsigned i=0; i<6; i++)
-			models[i].draw();
+			park_assets[i].draw();
 	}
 	void on_key_char(ALLEGRO_EVENT &ev)
 	{
