@@ -105,15 +105,6 @@ public:
 };
 
 
-static void set_perspective_transform(ALLEGRO_BITMAP* bmp)
-{
-   ALLEGRO_TRANSFORM p;
-   float aspect_ratio = (float)al_get_bitmap_height(bmp) / al_get_bitmap_width(bmp);
-   al_set_target_bitmap(bmp);
-   al_identity_transform(&p);
-   al_perspective_transform(&p, -1, aspect_ratio, 1, 1, -aspect_ratio, 1000);
-   al_use_projection_transform(&p);
-}
 
 
 class Camera
@@ -278,8 +269,6 @@ int main(int argc, char* argv[])
 	al_set_new_display_option(ALLEGRO_DEPTH_SIZE, 32, ALLEGRO_SUGGEST);
 	ALLEGRO_DISPLAY *display = al_create_display(800, 600);
 
-	set_perspective_transform(al_get_backbuffer(display));
-	
 	al_register_event_source(event_queue, al_get_timer_event_source(timer));
 	al_register_event_source(event_queue, al_get_mouse_event_source());	
 	al_register_event_source(event_queue, al_get_keyboard_event_source());	
