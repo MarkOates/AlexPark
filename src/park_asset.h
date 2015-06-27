@@ -61,6 +61,50 @@ public:
 		texture = tx;
 	}
 
+	virtual void draw_cube(bool use_id=false)
+	{
+		ALLEGRO_COLOR c = (use_id) ? encode_id(id) : (hovered ? al_color_name("yellow") : al_map_rgb_f(1, 1, 1));
+		ALLEGRO_TRANSFORM t;
+		float txw = 32;
+		float txh = 32;
+		ALLEGRO_VERTEX vtx[8] = {
+			{ 0.500000, 0.000000, -0.500000, txw, 0, c },
+			{ 0.500000, 0.000000, 0.500000, txw, txh, c },
+			{ -0.500000, 0.000000, 0.500000, 0, txh, c },
+			{ -0.500000, 0.000000, -0.500000, 0, 0, c },
+			{ 0.500000, 1.000000, -0.500000, 0, 0, c },
+			{ 0.500000, 1.000000, 0.500000, 0, 0, c },
+			{ -0.500000, 1.000000, 0.500000, 0, 0, c },
+			{ -0.500000, 1.000000, -0.500000, 0, 0, c }
+		};
+		int indices[36] = {
+			1-1, 2-1, 3-1,
+			1-1, 3-1, 4-1,
+			5-1, 8-1, 7-1,
+			5-1, 7-1, 6-1,
+			1-1, 5-1, 6-1,
+			1-1, 6-1, 2-1,
+			2-1, 6-1, 7-1,
+			2-1, 7-1, 3-1,
+			3-1, 7-1, 8-1,
+			3-1, 8-1, 4-1,
+			5-1, 1-1, 4-1,
+			5-1, 4-1, 8-1
+		};
+
+		for (unsigned i=0; i<8; i++)
+		{
+			vtx[i].x += 0.5;
+			vtx[i].z += 0.5;
+		}	
+
+		al_identity_transform(&t);
+		al_rotate_transform_3d(&t, 0, 1, 0, rotation_y);
+		al_translate_transform_3d(&t, position.x, position.y, position.z);
+		al_use_transform(&t);
+		al_draw_indexed_prim(vtx, NULL, use_id ? NULL : texture, indices, 36, ALLEGRO_PRIM_TRIANGLE_LIST);
+	}
+
 	virtual void draw(bool use_id=false)
 	{
 		ALLEGRO_COLOR c = (use_id) ? encode_id(id) : (hovered ? al_color_name("yellow") : al_map_rgb_f(1, 1, 1));
@@ -80,6 +124,12 @@ public:
 			0, 3, 4,
 			0, 4, 1
 		};
+
+		for (unsigned i=0; i<8; i++)
+		{
+			vtx[i].x += 0.5;
+			vtx[i].z += 0.5;
+		}	
 
 		al_identity_transform(&t);
 		al_rotate_transform_3d(&t, 0, 1, 0, rotation_y);

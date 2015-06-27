@@ -76,7 +76,7 @@ public:
 		al_clear_depth_buffer(1000);
 
 		for (unsigned i=0; i<6; i++)
-			park_assets[i].draw(true);
+			park_assets[i].draw_cube(true);
 
 		ground.fit_and_use_texture(ground.remap_coordinates_texture);
 		ground.draw(true);
@@ -108,7 +108,7 @@ public:
 		for (unsigned i=0; i<6; i++)
 		{
 			park_assets[i].hovered = (park_assets[i].id == hovered_asset_id);
-			park_assets[i].draw();
+			park_assets[i].draw_cube();
 		}
 
 		hud.draw();
