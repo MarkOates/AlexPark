@@ -21,6 +21,37 @@
 
 
 
+
+class Ground
+{
+public:
+	int w;
+	int h;
+	ALLEGRO_BITMAP *texture;
+	ALLEGRO_VERTEX vertexes[4];
+
+	Ground(float w, float h, ALLEGRO_BITMAP *tex)
+		: w(w)
+		, h(h)
+		, texture(tex)
+		, vertexes({
+				{-w/2, 0, -h/2, 0, 0, al_color_name("white")},
+				{-w/2, 0, h/2, 0, al_get_bitmap_height(tex), al_color_name("white")},
+				{w/2, 0, h/2, al_get_bitmap_width(tex), al_get_bitmap_height(tex), al_color_name("white")},
+				{w/2, 0, -h/2, al_get_bitmap_width(tex), 0, al_color_name("gray")}
+		})
+	{
+	}
+
+	void draw()
+	{
+		al_draw_prim(&vertexes, NULL, texture, 0, 4, ALLEGRO_PRIM_TRIANGLE_FAN);
+	}
+};
+
+
+
+
 class Model
 {
 public:
@@ -54,10 +85,10 @@ public:
 		ALLEGRO_VERTEX vtx[5] = {
 		/*   x   y   z   u   v  c  */
 			{ 0,  1,  0,  0, 64, c},
-			{-1, -1, -1,  0,  0, c},
-			{ 1, -1, -1, 64, 64, c},
-			{ 1, -1,  1, 64,  0, c},
-			{-1, -1,  1, 64, 64, c},
+			{-0.5, 0, -0.5,  0,  0, c},
+			{ 0.5, 0, -0.5, 64, 64, c},
+			{ 0.5, 0,  0.5, 64,  0, c},
+			{-0.5, 0,  0.5, 64, 64, c},
 		};
 		int indices[12] = {
 			0, 1, 2,
@@ -113,13 +144,11 @@ public:
 	void set45_isometric()
 	{
 		stepback = vec3d(0, 120, 120);
-		rotation = vec3d(-TAU/8.0, TAU/8.0, 0);
+		rotation = vec3d(-TAU/8.0, -TAU/8.0, 0);
 	}
 
-	void setup_camera_perspective(ALLEGRO_DISPLAY *display)
+	void setup_camera_perspective(ALLEGRO_BITMAP *bmp)
 	{
-		ALLEGRO_BITMAP *bmp = al_get_backbuffer(display);
-
 		ALLEGRO_TRANSFORM p;
 		float aspect_ratio = (float)al_get_bitmap_height(bmp) / al_get_bitmap_width(bmp);
 		al_set_target_bitmap(bmp);
@@ -140,12 +169,12 @@ public:
 		}
 
 		//al_perspective_transform(&p, -1, aspect_ratio, 1, 1, -aspect_ratio, 1000);
-		float znear = 100;
+		float znear = 5;
 		float zoom = (zoom_max - zoom_min) * zoom_pos + zoom_min; // 4 is closeup, 10 is wide
 		stepback = vec3d(0, znear*zoom, znear*zoom);
 		al_perspective_transform(&p,
 			-1, aspect_ratio, znear,
-			1, -aspect_ratio, 10000);
+			1, -aspect_ratio, 1000);
 		al_use_projection_transform(&p);
 
 		al_use_transform(al_get_current_transform());
@@ -166,25 +195,29 @@ public:
 
 	ALLEGRO_BITMAP *texture;
 	Model models[6];
+	Ground ground;
 
 	Project(ALLEGRO_DISPLAY *display)
 		: display(display)
 		, camera(0, 0, 0)
 		, park()
 		, abort_game(false)
-		, texture(al_load_bitmap("data/bitmaps/leafy_goodness.png"))
+		, texture(al_load_bitmap("data/bitmaps/stone.png"))
+		, ground(32, 32, al_load_bitmap("data/bitmaps/leafy_goodness.png"))
 	{
 		for (unsigned i=0; i<6; i++)
 		{
 			models[i].set_texture(texture);
-			models[i].position.x = i*3;
+			models[i].position.x = i*2;
 		}
 	}
 	void on_timer()
 	{
 		//	set_perspective_transform(al_get_backbuffer(display));
 		//camera.set_frustum_as_camera(display);
-		camera.setup_camera_perspective(display);
+		camera.setup_camera_perspective(al_get_backbuffer(display);
+
+		ground.draw();
 
 		for (unsigned i=0; i<6; i++)
 			models[i].draw();
@@ -241,7 +274,7 @@ int main(int argc, char* argv[])
 	ALLEGRO_TIMER *timer = al_create_timer(1.0/60.0);
 
 	// create the display
-	al_set_new_display_option(ALLEGRO_DEPTH_SIZE, 16, ALLEGRO_SUGGEST);
+	al_set_new_display_option(ALLEGRO_DEPTH_SIZE, 32, ALLEGRO_SUGGEST);
 	ALLEGRO_DISPLAY *display = al_create_display(800, 600);
 
 	set_perspective_transform(al_get_backbuffer(display));
