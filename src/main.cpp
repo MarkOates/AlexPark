@@ -26,25 +26,53 @@ class Ground
 public:
 	int w;
 	int h;
-	ALLEGRO_BITMAP *texture;
+	ALLEGRO_BITMAP *texture, *remap_coordinates_texture;
 	ALLEGRO_VERTEX vertexes[4];
 
-	Ground(float w, float h, ALLEGRO_BITMAP *tex)
+	Ground(int w, int h, ALLEGRO_BITMAP *tex)
 		: w(w)
 		, h(h)
 		, texture(tex)
+		, remap_coordinates_texture(create_remapable_texture(w, h, 1000))
 		, vertexes({
-				{-w/2, 0, -h/2, 0, 0, al_color_name("gray")},
-				{-w/2, 0, h/2, 0, (float)al_get_bitmap_height(tex), al_color_name("white")},
-				{w/2, 0, h/2, (float)al_get_bitmap_width(tex), (float)al_get_bitmap_height(tex), al_color_name("white")},
-				{w/2, 0, -h/2, (float)al_get_bitmap_width(tex), 0, al_color_name("white")}
+				{-w/2.0f, 0, -h/2.0f, 0, 0, al_color_name("white")},
+				{-w/2.0f, 0, h/2.0f, 0, (float)h, al_color_name("white")},
+				{w/2.0f, 0, h/2.0f, (float)w, (float)h, al_color_name("white")},
+				{w/2.0f, 0, -h/2.0f, (float)w, 0, al_color_name("white")}
 		})
 	{
 	}
 
-	void draw()
+	ALLEGRO_BITMAP *create_remapable_texture(int width, int height, int offset_number)
 	{
-		al_draw_prim(&vertexes, NULL, texture, 0, 4, ALLEGRO_PRIM_TRIANGLE_FAN);
+		ALLEGRO_BITMAP *bmp = al_create_bitmap(width, height);
+		ALLEGRO_STATE state;
+		al_store_state(&state, ALLEGRO_STATE_TARGET_BITMAP);
+		al_set_target_bitmap(bmp);
+		al_clear_to_color(al_color_name("black"));
+		al_lock_bitmap(bmp, ALLEGRO_PIXEL_FORMAT_ANY, ALLEGRO_LOCK_WRITEONLY);
+		for (unsigned y=0; y<height; y++)
+			for (unsigned x=0; x<width; x++)
+			{
+				al_put_pixel(x, y, encode_id(offset_number + x + y*width));
+			}
+		al_unlock_bitmap(bmp);
+		al_restore_state(&state);
+		return bmp;
+	}
+
+	std::pair<int, int> unmap_texture_coordinates(int id, int offset_number)
+	{
+		id -= offset_number;
+		int x = id % w;
+		int y = id / w;
+		return std::pair<int, int>(x, y);
+	}	
+
+
+	void draw(bool use_id=false)
+	{
+		al_draw_prim(&vertexes, NULL, use_id ? remap_coordinates_texture : texture, 0, 4, ALLEGRO_PRIM_TRIANGLE_FAN);
 	}
 
 };
@@ -117,7 +145,7 @@ public:
 	}
 };
 
-
+#include <utility>
 class Project
 {
 public:
@@ -169,9 +197,21 @@ public:
 		for (unsigned i=0; i<6; i++)
 			park_assets[i].draw(true);
 
+		ground.draw(true);
+
 		// set the current hovered_asset_id
-		int hovered_asset_id = decode_id(al_get_pixel(pointer_target_buffer, mouse_x, mouse_y));
-		std::cout << hovered_asset_id << " ";
+		ALLEGRO_COLOR pointed_pixel_value = al_get_pixel(pointer_target_buffer, mouse_x, mouse_y);
+		int hovered_asset_id = decode_id(pointed_pixel_value);
+
+		// for now, lets just the square blue that's being pointed to
+		if (hovered_asset_id >= 1000)
+		{
+			std::pair<int, int> coords = ground.unmap_texture_coordinates(hovered_asset_id, 1000);
+			int x = std::get<0>(coords);
+			int y = std::get<1>(coords);
+			al_set_target_bitmap(ground.texture);
+			al_put_pixel(x, y, al_color_name("dodgerblue"));
+		}
 
 		//
 		// this draws the actual scene
