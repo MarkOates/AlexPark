@@ -40,12 +40,11 @@ public:
 		return bmp;
 	}
 
-	std::pair<int, int> unmap_texture_coordinates(int id, int offset_number)
+	void unmap_texture_coordinates(int id, int offset_number, int *x, int *y)
 	{
 		id -= offset_number;
-		int x = id % w;
-		int y = id / w;
-		return std::pair<int, int>(x, y);
+		*x = id % w;
+		*y = id / w;
 	}	
 
 

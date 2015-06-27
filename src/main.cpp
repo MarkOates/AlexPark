@@ -23,10 +23,6 @@
 
 
 
-#include <utility>
-
-
-
 class Project
 {
 public:
@@ -87,9 +83,8 @@ public:
 		// for now, lets just the square blue that's being pointed to
 		if (hovered_asset_id >= 1000)
 		{
-			std::pair<int, int> coords = ground.unmap_texture_coordinates(hovered_asset_id, 1000);
-			int x = std::get<0>(coords);
-			int y = std::get<1>(coords);
+			int x, y;
+			ground.unmap_texture_coordinates(hovered_asset_id, 1000, &x, &y);
 			al_set_target_bitmap(ground.texture);
 			al_put_pixel(x, y, al_color_name("dodgerblue"));
 		}
