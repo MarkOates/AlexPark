@@ -165,7 +165,7 @@ public:
 		, camera(0, 0, 0)
 		, park()
 		, abort_game(false)
-		, texture(al_load_bitmap("leafy_goodness.png"))
+		, texture(al_load_bitmap("data/bitmaps/leafy_goodness.png"))
 	{
 		for (unsigned i=0; i<6; i++)
 		{
