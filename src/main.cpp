@@ -10,14 +10,13 @@
 #include <vector>
 #include <iostream>
 
+#include "color_encode_id.h"
 #include "park_asset.h"
 #include "heat_map.h"
 #include "park.h"
 #include "vec3d.h"
 
 #define TAU (ALLEGRO_PI * 2)
-
-
 
 
 
@@ -35,10 +34,10 @@ public:
 		, h(h)
 		, texture(tex)
 		, vertexes({
-				{-w/2, 0, -h/2, 0, 0, al_color_name("white")},
-				{-w/2, 0, h/2, 0, al_get_bitmap_height(tex), al_color_name("white")},
-				{w/2, 0, h/2, al_get_bitmap_width(tex), al_get_bitmap_height(tex), al_color_name("white")},
-				{w/2, 0, -h/2, al_get_bitmap_width(tex), 0, al_color_name("gray")}
+				{-w/2, 0, -h/2, 0, 0, al_color_name("gray")},
+				{-w/2, 0, h/2, 0, (float)al_get_bitmap_height(tex), al_color_name("white")},
+				{w/2, 0, h/2, (float)al_get_bitmap_width(tex), (float)al_get_bitmap_height(tex), al_color_name("white")},
+				{w/2, 0, -h/2, (float)al_get_bitmap_width(tex), 0, al_color_name("white")}
 		})
 	{
 	}
@@ -144,7 +143,7 @@ public:
 	void set45_isometric()
 	{
 		stepback = vec3d(0, 120, 120);
-		rotation = vec3d(-TAU/8.0, -TAU/8.0, 0);
+		rotation = vec3d(-TAU/8.0, TAU/16.0, 0);
 	}
 
 	void setup_camera_perspective(ALLEGRO_BITMAP *bmp)
@@ -189,6 +188,7 @@ class Project
 {
 public:
 	ALLEGRO_DISPLAY *display;
+	ALLEGRO_BITMAP *pointer_target_buffer;
 	Camera camera;
 	Park park;
 	bool abort_game;
@@ -199,11 +199,12 @@ public:
 
 	Project(ALLEGRO_DISPLAY *display)
 		: display(display)
+		, pointer_target_buffer(al_create_bitmap(al_get_display_width(display), al_get_display_height(display)))
 		, camera(0, 0, 0)
 		, park()
 		, abort_game(false)
 		, texture(al_load_bitmap("data/bitmaps/stone.png"))
-		, ground(32, 32, al_load_bitmap("data/bitmaps/leafy_goodness.png"))
+		, ground(32, 32, al_load_bitmap("data/bitmaps/ground_texture.png"))
 	{
 		for (unsigned i=0; i<6; i++)
 		{
@@ -215,7 +216,7 @@ public:
 	{
 		//	set_perspective_transform(al_get_backbuffer(display));
 		//camera.set_frustum_as_camera(display);
-		camera.setup_camera_perspective(al_get_backbuffer(display);
+		camera.setup_camera_perspective(al_get_backbuffer(display));
 
 		ground.draw();
 
