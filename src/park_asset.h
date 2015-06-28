@@ -15,6 +15,7 @@ public:
 	// labels
 	std::string type;
 	ALLEGRO_COLOR color;
+	int32_t icon_char; 
 	int id;
 
 	// dimentions
@@ -53,6 +54,7 @@ public:
 	ParkAsset()
 		: type("")
 		, color(al_color_name("white"))
+		, icon_char(0xf15a)
 		, id(++last_id)
 		, position(0, 0, 0)
 		, rotation_y(0)
@@ -268,7 +270,7 @@ public:
 	{
 		type = PA_CONCESSION_STAND;
 		texture = NULL;
-		color = al_color_name("darkslategray");
+		color = al_color_name("antiquewhite");
 
 		initial_cost = 500;
 

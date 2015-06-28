@@ -21,7 +21,7 @@ void draw_ustr_chr(int32_t ustr_char, float x, float y, float align_x, float ali
 	al_ustr_set_chr(ustr, 0, ustr_char);
 	al_draw_ustr(font, color,
 		x - al_get_ustr_width(font, ustr) * align_x,
-		y - al_get_font_ascent(font) * align_y,
+		y - al_get_font_line_height(font) * align_y,
 		0,
 		ustr); 
 	al_ustr_free(ustr);
@@ -34,6 +34,7 @@ void draw_ustr_chr(int32_t ustr_char, float x, float y, float align_x, float ali
 #include "park_asset.h"
 #include "heat_map.h"
 #include "park.h"
+#include "hud.h"
 #include "ground.h"
 #include "camera.h"
 
@@ -66,7 +67,7 @@ public:
 		, pointer_target_buffer(al_create_bitmap(al_get_display_width(display), al_get_display_height(display)))
 		, camera(0, 0, 0)
 		, park()
-		, hud(display, &park)
+		, hud(display, pointer_target_buffer, &park)
 		, abort_game(false)
 		, texture(al_load_bitmap("data/bitmaps/stone.png"))
 		, ground(32, 32)
@@ -83,7 +84,7 @@ public:
 		camera.position.y -= 10;
 		for (unsigned i=0; i<1; i++)
 		{
-			park.purchase_asset(hud.park_asset_selected_on_menu, 16, 16);
+			park.purchase_asset(hud.get_current_selected_asset(), 16, 16);
 		}
 	}
 
@@ -151,6 +152,8 @@ public:
 
 		park.draw(true);
 
+		hud.draw(true);
+
 
 		//
 		// parse the asset data and retrieve the useful information
@@ -162,7 +165,12 @@ public:
 
 		ground_x = -1;
 		ground_y = -1;
-		if (park.hovered_asset_id >= 1000)
+		hud.hovered_ui_id = -1;
+		if (park.hovered_asset_id > 40000) // gui
+		{
+			hud.hovered_ui_id = park.hovered_asset_id - 40000;
+		}
+		else if (park.hovered_asset_id >= 1000)
 		{
 			ground.unmap_texture_coordinates(park.hovered_asset_id, 1000, &ground_x, &ground_y);
 			//al_set_target_bitmap(ground.texture);
@@ -237,7 +245,7 @@ public:
 	{
 		if (ground_x < 0 || ground_y < 0) return;
 
-		park.purchase_asset(hud.park_asset_selected_on_menu, ground_x, ground_y);
+		park.purchase_asset(hud.get_current_selected_asset(), ground_x, ground_y);
 	}
 };
 
