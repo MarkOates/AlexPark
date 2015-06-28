@@ -29,6 +29,7 @@ void draw_ustr_chr(int32_t ustr_char, float x, float y, float align_x, float ali
 
 
 #include "color_encode_id.h"
+#include "assets.h"
 #include "vec3d.h"
 #include "park_asset.h"
 #include "heat_map.h"
@@ -58,9 +59,7 @@ public:
 	int ground_x, ground_y;
 
 	ALLEGRO_BITMAP *asset_plot_shadow;
-
-	std::vector<ParkAsset *> all_assets;
-	ParkAsset *park_asset_selected_on_menu;
+	ALLEGRO_BITMAP *grass_texture;
 
 	Project(ALLEGRO_DISPLAY *display)
 		: display(display)
@@ -76,36 +75,15 @@ public:
 		, ground_x(0)
 		, ground_y(0)
 		, asset_plot_shadow(al_load_bitmap("data/bitmaps/plot_shadow.png"))
-		, all_assets()
-		, park_asset_selected_on_menu(NULL)
+		, grass_texture(generate_noise_bitmap(1024, 1024, al_color_html("89ae58"), al_color_html("6e943c")))
 	{
-		// build our list of all the available assets
-		all_assets.push_back(FACTORY_create_asset(PA_CONCESSION_STAND));
-		all_assets.push_back(FACTORY_create_asset(PA_PARK_ENTRANCE));
-		all_assets.push_back(FACTORY_create_asset(PA_MERRY_GO_ROUND));
-		all_assets.push_back(FACTORY_create_asset(PA_ROLLER_COASTER));
-		all_assets.push_back(FACTORY_create_asset(PA_BUSH));
-		all_assets.push_back(FACTORY_create_asset(PA_HORROR_HOUSE));
-		all_assets.push_back(FACTORY_create_asset(PA_CRAZY_LAND));
-		all_assets.push_back(FACTORY_create_asset(PA_INFORMATION_CENTER));
-		all_assets.push_back(FACTORY_create_asset(PA_PUBLIC_RESTROOMS));
-		all_assets.push_back(FACTORY_create_asset(PA_WATER_FOUNTAIN));
-		all_assets.push_back(FACTORY_create_asset(PA_MERCHANDISE_STORE));
-		all_assets.push_back(FACTORY_create_asset(PA_JUNGLE_GYM));
-		all_assets.push_back(FACTORY_create_asset(PA_PARK_BENCH));
-		all_assets.push_back(FACTORY_create_asset(PA_FERRIS_WHEEL));
-		all_assets.push_back(FACTORY_create_asset(PA_ALEX_STATUE));
-
-		// select the first one on the list
-		park_asset_selected_on_menu = all_assets[6];
-		
 		// set the camera position to nice and wide
 		camera.zoom_pos -= 1.0;
 		camera.position.x += 20;
 		camera.position.y -= 10;
 		for (unsigned i=0; i<1; i++)
 		{
-			park.purchase_asset(park_asset_selected_on_menu, 16, 16);
+			park.purchase_asset(hud.park_asset_selected_on_menu, 16, 16);
 		}
 	}
 
@@ -114,12 +92,17 @@ public:
 		ALLEGRO_STATE previous_state;
 		al_store_state(&previous_state, ALLEGRO_STATE_TARGET_BITMAP | ALLEGRO_STATE_BLENDER);
 		al_set_target_bitmap(ground.render_surface);		
+		al_set_render_state(ALLEGRO_DEPTH_TEST, 0);
 
 		al_clear_to_color(al_color_html("689f41"));
 		float x_scale = al_get_bitmap_width(ground.render_surface) / (float)ground.w;
 		float y_scale = al_get_bitmap_height(ground.render_surface) / (float)ground.h;
 
-		//al_draw_filled_rectangle(0, 0, 2000, 2000, al_color_name("green"));
+		al_draw_bitmap(grass_texture, 0, 0, 0);
+
+//		for (unsigned y=0; y<ground.h; y++)
+//			for (unsigned x=0; x<ground.w; x++)
+//				al_draw_filled_circle(x * x_scale, y * y_scale, 1, al_color_name("black"));
 
 		// draw the cursor
 		if (ground_x >= 0)
@@ -140,10 +123,11 @@ public:
 		{
 			int x = park.assets[i]->position.x * x_scale;
 			int y = park.assets[i]->position.z * y_scale;
-			al_draw_bitmap(asset_plot_shadow, x-8, y-8, 0);
+			al_draw_bitmap(asset_plot_shadow, x-16, y-16, 0);
 		}
 
 		al_restore_state(&previous_state);
+		al_set_render_state(ALLEGRO_DEPTH_TEST, 1);
 	}
 
 	void on_timer()
@@ -253,7 +237,7 @@ public:
 	{
 		if (ground_x < 0 || ground_y < 0) return;
 
-		park.purchase_asset(park_asset_selected_on_menu, ground_x, ground_y);
+		park.purchase_asset(hud.park_asset_selected_on_menu, ground_x, ground_y);
 	}
 };
 

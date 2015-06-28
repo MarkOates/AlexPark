@@ -599,6 +599,13 @@ ParkAsset *FACTORY_create_asset(std::string type)
 	if (type == PA_HORROR_HOUSE) return new HorrorHouse();
 	if (type == PA_CRAZY_LAND) return new CrazyLand();
 	if (type == PA_INFORMATION_CENTER) return new InformationCenter();
+	if (type == PA_PUBLIC_RESTROOMS) return new PublicRestrooms();
+	if (type == PA_WATER_FOUNTAIN) return new InformationCenter();
+	if (type == PA_MERCHANDISE_STORE) return new MerchandiseStore();
+	if (type == PA_JUNGLE_GYM) return new JungleGym();
+	if (type == PA_PARK_BENCH) return new ParkBench();
+	if (type == PA_FERRIS_WHEEL) return new FerrisWheel();
+	if (type == PA_ALEX_STATUE) return new AlexStatue();
 
 	std::cerr << "Cannot create new ParkAsset of type \"" << type << "\"" << std::endl;
 }

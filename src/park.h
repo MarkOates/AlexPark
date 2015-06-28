@@ -216,14 +216,39 @@ public:
 	ALLEGRO_FONT *icons;
 	Park &park;
 
+	ParkAsset *park_asset_selected_on_menu;
+	std::vector<ParkAsset *> all_assets;
+
 	HUD(ALLEGRO_DISPLAY *display, Park *park)
 		: display(display)
 		, hud_overlay(al_create_sub_bitmap(al_get_backbuffer(display), 0, 0, al_get_display_width(display), al_get_display_height(display)))
 		, font(al_load_font("data/fonts/Dense-Regular.otf", 36, 0))
 		, icons(al_load_font("data/fonts/FontAwesome.otf", 30, 0))
+		, all_assets()
+		, park_asset_selected_on_menu(NULL)
 		, park(*park)
 	{
 		if (!font || !icons) std::cerr << "AAHGFHGHGHGHG (no fonts found)" << std::endl;
+
+		// build our list of all the available assets
+		all_assets.push_back(FACTORY_create_asset(PA_CONCESSION_STAND));
+		all_assets.push_back(FACTORY_create_asset(PA_PARK_ENTRANCE));
+		all_assets.push_back(FACTORY_create_asset(PA_MERRY_GO_ROUND));
+		all_assets.push_back(FACTORY_create_asset(PA_ROLLER_COASTER));
+		all_assets.push_back(FACTORY_create_asset(PA_BUSH));
+		all_assets.push_back(FACTORY_create_asset(PA_HORROR_HOUSE));
+		all_assets.push_back(FACTORY_create_asset(PA_CRAZY_LAND));
+		all_assets.push_back(FACTORY_create_asset(PA_INFORMATION_CENTER));
+		all_assets.push_back(FACTORY_create_asset(PA_PUBLIC_RESTROOMS));
+		all_assets.push_back(FACTORY_create_asset(PA_WATER_FOUNTAIN));
+		all_assets.push_back(FACTORY_create_asset(PA_MERCHANDISE_STORE));
+		all_assets.push_back(FACTORY_create_asset(PA_JUNGLE_GYM));
+		all_assets.push_back(FACTORY_create_asset(PA_PARK_BENCH));
+		all_assets.push_back(FACTORY_create_asset(PA_FERRIS_WHEEL));
+		all_assets.push_back(FACTORY_create_asset(PA_ALEX_STATUE));
+
+		// select the first one on the list
+		park_asset_selected_on_menu = all_assets[0];
 	}
 	void draw()
 	{
@@ -248,6 +273,9 @@ public:
 			al_draw_textf(font, color, al_get_display_width(display)/2, al_get_display_height(display)-40, ALLEGRO_ALIGN_CENTER,
 				"%s %d", asset->type.c_str(), asset->id);
 		}
+
+		if (park_asset_selected_on_menu)
+			al_draw_text(font, color, al_get_display_width(display)-20, al_get_display_height(display)-40, ALLEGRO_ALIGN_RIGHT, park_asset_selected_on_menu->type.c_str());
 
 		draw_ustr_chr(0xf15a, 100, 100, 0.5, 0.5, al_color_name("white"), icons);
 	}

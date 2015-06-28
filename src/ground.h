@@ -11,7 +11,7 @@ public:
 	Ground(int w, int h)
 		: w(w)
 		, h(h)
-		, render_surface(al_create_bitmap(512, 512))
+		, render_surface(al_create_bitmap(1024, 1024))
 		, remap_coordinates_texture(create_remapable_texture(w, h, 1000))
 		, vertexes({
 				{0, 0, 0, 0, 0, al_color_name("white")},

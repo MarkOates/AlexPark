@@ -3,7 +3,7 @@
 ALLEGRO_COLOR encode_id(int id)
 {
 	ALLEGRO_COLOR color;
-	//if (id >= (256*4)) return al_map_rgba(0, 0, 0, 0);
+	//if (id >= (256*4)) return al_map_rgba(1, 0, 0, 0);
 	unsigned char r = id / 256;
 	unsigned char g = id % 256;
 	return al_map_rgba(r, g, 0, 255);
