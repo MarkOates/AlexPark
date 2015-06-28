@@ -1,6 +1,11 @@
 
 
 
+
+
+
+
+
 class ParkAsset
 {
 private:
@@ -226,13 +231,35 @@ int ParkAsset::last_id = 0;
 
 
 
+
+
+class ParkAssetType
+{
+public:
+	ALLEGRO_BITMAP *thumbnail;
+	ParkAsset &asset_ex;
+};
+
+
+
+#define PA_CONCESSION_STAND "Concession Stand"
+#define PA_PARK_ENTRANCE "Park Entrance"
+#define PA_MERRY_GO_ROUND "Merry-Go-Round"
+#define PA_ROLLER_COASTER "Roller Coaster"
+#define PA_BUSH "Bush"
+#define PA_HORROR_HOUSE "Horror House"
+#define PA_CRAZY_LAND "Crazy Land"
+#define PA_INFORMATION_DESK "Information Desk"
+
+
+
 class ConcessionStand : public ParkAsset
 {
 public:
 	ConcessionStand()
 		: ParkAsset()
 	{
-		type = "Concession Stand";
+		type = PA_CONCESSION_STAND;
 		texture = NULL;
 		color = al_color_name("darkslategray");
 
@@ -248,6 +275,172 @@ public:
 
 
 
+class ParkEntrance : public ParkAsset
+{
+public:
+	ParkEntrance()
+		: ParkAsset()
+	{
+		type = PA_PARK_ENTRANCE;
+		texture = NULL;
+		color = al_color_name("pink");
+
+		initial_cost = 0;
+
+		expense_per_turn = 0;
+		max_num_customers_served = 0;
+		customer_happiness_created = 0;
+		profit = 0;
+		num_customers_brought_to_park = 0;
+	}
+};
 
 
 
+class MerryGoRound : public ParkAsset
+{
+public:
+	MerryGoRound()
+		: ParkAsset()
+	{
+		type = PA_MERRY_GO_ROUND;
+		texture = NULL;
+		color = al_color_name("orange");
+
+		initial_cost = 500;
+
+		expense_per_turn = 1;
+		max_num_customers_served = 2;
+		customer_happiness_created = 3;
+		profit = 0;
+		num_customers_brought_to_park = 3;
+	}
+};
+
+
+
+class RollerCoaster : public ParkAsset
+{
+public:
+	RollerCoaster()
+		: ParkAsset()
+	{
+		type = PA_ROLLER_COASTER;
+		texture = NULL;
+		color = al_color_name("red");
+
+		initial_cost = 8000;
+
+		expense_per_turn = 2;
+		max_num_customers_served = 3;
+		customer_happiness_created = 5;
+		profit = 0;
+		num_customers_brought_to_park = 5;
+	}
+};
+
+
+
+class Bush : public ParkAsset
+{
+public:
+	Bush()
+		: ParkAsset()
+	{
+		type = PA_BUSH;
+		texture = NULL;
+		color = al_color_name("chartreuce");
+
+		initial_cost = 200;
+
+		expense_per_turn = 0;
+		max_num_customers_served = 1;
+		customer_happiness_created = 1;
+		profit = 0;
+		num_customers_brought_to_park = 0;
+	}
+};
+
+
+
+class HorrorHouse : public ParkAsset
+{
+public:
+	HorrorHouse()
+		: ParkAsset()
+	{
+		type = PA_HORROR_HOUSE;
+		texture = NULL;
+		color = al_color_name("darkslategray");
+
+		initial_cost = 5000;
+
+		expense_per_turn = 2;
+		max_num_customers_served = 3;
+		customer_happiness_created = 4;
+		profit = 0;
+		num_customers_brought_to_park = 5;
+	}
+};
+
+
+
+class CrazyLand : public ParkAsset
+{
+public:
+	CrazyLand()
+		: ParkAsset()
+	{
+		type = PA_CRAZY_LAND;
+		texture = NULL;
+		color = al_color_name("electricpink");
+
+		initial_cost = 5000;
+
+		expense_per_turn = 2;
+		max_num_customers_served = 3;
+		customer_happiness_created = 4;
+		profit = 0;
+		num_customers_brought_to_park = 5;
+	}
+};
+
+
+
+class InformationDesk : public ParkAsset
+{
+public:
+	InformationDesk()
+		: ParkAsset()
+	{
+		type = PA_INFORMATION_DESK;
+		texture = NULL;
+		color = al_color_name("dodgerblue");
+
+		initial_cost = 2000;
+
+		expense_per_turn = 2;
+		max_num_customers_served = 3;
+		customer_happiness_created = 3;
+		profit = 0;
+		num_customers_brought_to_park = 3;
+	}
+};
+
+
+
+
+
+ParkAsset *FACTORY_create_asset(std::string type)
+{
+	if (type == PA_CONCESSION_STAND) return new ConcessionStand();
+	if (type == PA_PARK_ENTRANCE) return new ParkEntrance();
+	if (type == PA_MERRY_GO_ROUND) return new MerryGoRound();
+	if (type == PA_ROLLER_COASTER) return new RollerCoaster();
+	if (type == PA_BUSH) return new Bush();
+	if (type == PA_HORROR_HOUSE) return new HorrorHouse();
+	if (type == PA_CRAZY_LAND) return new CrazyLand();
+	if (type == PA_INFORMATION_DESK) return new InformationDesk();
+
+	std::cerr << "Cannot create new ParkAsset of type \"" << type << "\"" << std::endl;
+}
