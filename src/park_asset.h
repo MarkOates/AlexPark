@@ -98,17 +98,21 @@ public:
 			vtx[i].z += 0.5;
 		}	
 
+		ALLEGRO_STATE prev_state;
+		al_store_state(&prev_state, ALLEGRO_STATE_TRANSFORM);
+
 		al_identity_transform(&t);
 		al_rotate_transform_3d(&t, 0, 1, 0, rotation_y);
 		al_translate_transform_3d(&t, position.x, position.y, position.z);
 		al_use_transform(&t);
 		al_draw_indexed_prim(vtx, NULL, use_id ? NULL : texture, indices, 36, ALLEGRO_PRIM_TRIANGLE_LIST);
+
+		al_restore_state(&prev_state);
 	}
 
 	virtual void draw(bool use_id=false)
 	{
 		ALLEGRO_COLOR c = (use_id) ? encode_id(id) : (hovered ? al_color_name("yellow") : al_map_rgb_f(1, 1, 1));
-		//ALLEGRO_COLOR c = encode_id(id);
 		ALLEGRO_TRANSFORM t;
 		ALLEGRO_VERTEX vtx[5] = {
 		/*   x   y   z   u   v  c  */
@@ -131,11 +135,16 @@ public:
 			vtx[i].z += 0.5;
 		}	
 
+		ALLEGRO_STATE prev_state;
+		al_store_state(&prev_state, ALLEGRO_STATE_TRANSFORM);
+
 		al_identity_transform(&t);
 		al_rotate_transform_3d(&t, 0, 1, 0, rotation_y);
 		al_translate_transform_3d(&t, position.x, position.y, position.z);
 		al_use_transform(&t);
 		al_draw_indexed_prim(vtx, NULL, use_id ? NULL : texture, indices, 12, ALLEGRO_PRIM_TRIANGLE_LIST);
+
+		al_restore_state(&prev_state);
 	}
 };
 int ParkAsset::last_id = 0;
