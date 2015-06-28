@@ -65,28 +65,30 @@ public:
 				plots_of_land[x][y] = 0;
 	}
 
-	bool purchase_ConcessionStand(int x, int y)
+	bool purchase_asset(ParkAsset *menu_asset_selected, int x, int y)
 	{
+		// is the provided asset example valid?
+		if (!menu_asset_selected) return false;
+
 		// is the space available?
 		if (x < 0 || x >= 32) return false; // outside of bounds!!
 		if (y < 0 || y >= 32) return false; // outside of bounds!!
 		if (plots_of_land[x][y] != 0) return false; // this plot is occupied (or not available -1)!
 
 		// can the park afford it?
-		ConcessionStand *stand = NULL;
-		if (money < 500) return false; // you don't have enough money
+		if (money < menu_asset_selected->initial_cost) return false; // you don't have enough money
 
 		// make it
-		stand = new ConcessionStand();
-		assets.push_back(stand);
-		stand->position.x = x;
-		stand->position.z = y;
+		ParkAsset *new_asset = FACTORY_create_asset(menu_asset_selected->type);
+		assets.push_back(new_asset);
+		new_asset->position.x = x;
+		new_asset->position.z = y;
 
 		// add the id to the lease
-		plots_of_land[x][y] = stand->id;
+		plots_of_land[x][y] = new_asset->id;
 
 		// deduct the money from the park
-		money -= stand->initial_cost;
+		money -= new_asset->initial_cost;
 
 		return true; // woo-hoo!
 	}
@@ -250,6 +252,9 @@ public:
 		draw_ustr_chr(0xf15a, 100, 100, 0.5, 0.5, al_color_name("white"), icons);
 	}
 };
+
+
+
 
 
 

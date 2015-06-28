@@ -59,6 +59,9 @@ public:
 
 	ALLEGRO_BITMAP *asset_plot_shadow;
 
+	std::vector<ParkAsset *> all_assets;
+	ParkAsset *park_asset_selected_on_menu;
+
 	Project(ALLEGRO_DISPLAY *display)
 		: display(display)
 		, pointer_target_buffer(al_create_bitmap(al_get_display_width(display), al_get_display_height(display)))
@@ -73,20 +76,36 @@ public:
 		, ground_x(0)
 		, ground_y(0)
 		, asset_plot_shadow(al_load_bitmap("data/bitmaps/plot_shadow.png"))
+		, all_assets()
+		, park_asset_selected_on_menu(NULL)
 	{
+		// build our list of all the available assets
+		all_assets.push_back(FACTORY_create_asset(PA_CONCESSION_STAND));
+		all_assets.push_back(FACTORY_create_asset(PA_PARK_ENTRANCE));
+		all_assets.push_back(FACTORY_create_asset(PA_MERRY_GO_ROUND));
+		all_assets.push_back(FACTORY_create_asset(PA_ROLLER_COASTER));
+		all_assets.push_back(FACTORY_create_asset(PA_BUSH));
+		all_assets.push_back(FACTORY_create_asset(PA_HORROR_HOUSE));
+		all_assets.push_back(FACTORY_create_asset(PA_CRAZY_LAND));
+		all_assets.push_back(FACTORY_create_asset(PA_INFORMATION_CENTER));
+		all_assets.push_back(FACTORY_create_asset(PA_PUBLIC_RESTROOMS));
+		all_assets.push_back(FACTORY_create_asset(PA_WATER_FOUNTAIN));
+		all_assets.push_back(FACTORY_create_asset(PA_MERCHANDISE_STORE));
+		all_assets.push_back(FACTORY_create_asset(PA_JUNGLE_GYM));
+		all_assets.push_back(FACTORY_create_asset(PA_PARK_BENCH));
+		all_assets.push_back(FACTORY_create_asset(PA_FERRIS_WHEEL));
+		all_assets.push_back(FACTORY_create_asset(PA_ALEX_STATUE));
+
+		// select the first one on the list
+		park_asset_selected_on_menu = all_assets[6];
+		
+		// set the camera position to nice and wide
 		camera.zoom_pos -= 1.0;
 		camera.position.x += 20;
 		camera.position.y -= 10;
 		for (unsigned i=0; i<1; i++)
 		{
-			/*
-			park.assets.push_back(new ConcessionStand());
-			park.assets[i]->set_texture(texture);
-			park.assets[i]->position.x = 16 + i*2;
-			park.assets[i]->position.z = 16;
-			park.money -= park.assets[i]->initial_cost;
-			*/
-			park.purchase_ConcessionStand(16, 16);
+			park.purchase_asset(park_asset_selected_on_menu, 16, 16);
 		}
 	}
 
@@ -211,7 +230,13 @@ public:
 			case ALLEGRO_KEY_PAD_MINUS:
 				camera.zoom_pos -= 0.1;
 				break;
+			case ALLEGRO_KEY_EQUALS:
+				park.money += 1000;
+				break;
 			case ALLEGRO_KEY_ENTER:
+				// this will save a bitmap of the pointer_target_buffer,
+				// which is the bitmap used to ditermine what object
+				// the mouse is pointing at
 				al_save_bitmap("pointer_buffer.bmp", pointer_target_buffer);
 				break;
 		}
@@ -228,7 +253,7 @@ public:
 	{
 		if (ground_x < 0 || ground_y < 0) return;
 
-		park.purchase_ConcessionStand(ground_x, ground_y);
+		park.purchase_asset(park_asset_selected_on_menu, ground_x, ground_y);
 	}
 };
 

@@ -249,7 +249,14 @@ public:
 #define PA_BUSH "Bush"
 #define PA_HORROR_HOUSE "Horror House"
 #define PA_CRAZY_LAND "Crazy Land"
-#define PA_INFORMATION_DESK "Information Desk"
+#define PA_INFORMATION_CENTER "Information Center"
+#define PA_PUBLIC_RESTROOMS "Public Restrooms"
+#define PA_WATER_FOUNTAIN "Water Fountain"
+#define PA_MERCHANDISE_STORE "Merchandise Store"
+#define PA_JUNGLE_GYM "Jugle Gym"
+#define PA_PARK_BENCH "Park Bench"
+#define PA_FERRIS_WHEEL "Ferris Wheel"
+#define PA_ALEX_STATUE "Alex Statue"
 
 
 
@@ -393,7 +400,7 @@ public:
 	{
 		type = PA_CRAZY_LAND;
 		texture = NULL;
-		color = al_color_name("electricpink");
+		color = al_color_name("deeppink");
 
 		initial_cost = 5000;
 
@@ -407,13 +414,13 @@ public:
 
 
 
-class InformationDesk : public ParkAsset
+class InformationCenter : public ParkAsset
 {
 public:
-	InformationDesk()
+	InformationCenter()
 		: ParkAsset()
 	{
-		type = PA_INFORMATION_DESK;
+		type = PA_INFORMATION_CENTER;
 		texture = NULL;
 		color = al_color_name("dodgerblue");
 
@@ -429,6 +436,157 @@ public:
 
 
 
+class PublicRestrooms : public ParkAsset
+{
+public:
+	PublicRestrooms()
+		: ParkAsset()
+	{
+		type = PA_PUBLIC_RESTROOMS;
+		texture = NULL;
+		color = al_color_name("gray");
+
+		initial_cost = 1500;
+
+		expense_per_turn = 2;
+		max_num_customers_served = 5;
+		customer_happiness_created = 5;
+		profit = 0;
+		num_customers_brought_to_park = 0;
+	}
+};
+
+
+
+class WaterFountain : public ParkAsset
+{
+public:
+	WaterFountain()
+		: ParkAsset()
+	{
+		type = PA_WATER_FOUNTAIN;
+		texture = NULL;
+		color = al_color_name("white");
+
+		initial_cost = 500;
+
+		expense_per_turn = 0;
+		max_num_customers_served = 1;
+		customer_happiness_created = 2;
+		profit = 0;
+		num_customers_brought_to_park = 0;
+	}
+};
+
+
+class MerchandiseStore : public ParkAsset
+{
+public:
+	MerchandiseStore()
+		: ParkAsset()
+	{
+		type = PA_MERCHANDISE_STORE;
+		texture = NULL;
+		color = al_color_name("blue");
+
+		initial_cost = 5000;
+
+		expense_per_turn = 0;
+		max_num_customers_served = 5;
+		customer_happiness_created = 1;
+		profit = 5;
+		num_customers_brought_to_park = 5;
+	}
+};
+
+
+class JungleGym : public ParkAsset
+{
+public:
+	JungleGym()
+		: ParkAsset()
+	{
+		type = PA_JUNGLE_GYM;
+		texture = NULL;
+		color = al_color_name("silver");
+
+		initial_cost = 300;
+
+		expense_per_turn = 0;
+		max_num_customers_served = 2;
+		customer_happiness_created = 1;
+		profit = 0;
+		num_customers_brought_to_park = 0;
+	}
+};
+
+
+class ParkBench : public ParkAsset
+{
+public:
+	ParkBench()
+		: ParkAsset()
+	{
+		type = PA_PARK_BENCH;
+		texture = NULL;
+		color = al_color_name("peru");
+
+		initial_cost = 200;
+
+		expense_per_turn = 0;
+		max_num_customers_served = 1;
+		customer_happiness_created = 1;
+		profit = 0;
+		num_customers_brought_to_park = 0;
+	}
+};
+
+
+class FerrisWheel : public ParkAsset
+{
+public:
+	FerrisWheel()
+		: ParkAsset()
+	{
+		type = PA_FERRIS_WHEEL;
+		texture = NULL;
+		color = al_color_name("powderblue");
+
+		initial_cost = 10000;
+
+		expense_per_turn = 3;
+		max_num_customers_served = 3;
+		customer_happiness_created = 5;
+		profit = 0;
+		num_customers_brought_to_park = 5;
+	}
+};
+
+
+
+class AlexStatue : public ParkAsset
+{
+public:
+	AlexStatue()
+		: ParkAsset()
+	{
+		type = PA_ALEX_STATUE;
+		texture = NULL;
+		color = al_color_name("springgreen");
+
+		initial_cost = 100000;
+
+		expense_per_turn = 0;
+		max_num_customers_served = 3;
+		customer_happiness_created = 3;
+		profit = 0;
+		num_customers_brought_to_park = 5;
+	}
+};
+
+
+
+
 
 
 ParkAsset *FACTORY_create_asset(std::string type)
@@ -440,7 +598,7 @@ ParkAsset *FACTORY_create_asset(std::string type)
 	if (type == PA_BUSH) return new Bush();
 	if (type == PA_HORROR_HOUSE) return new HorrorHouse();
 	if (type == PA_CRAZY_LAND) return new CrazyLand();
-	if (type == PA_INFORMATION_DESK) return new InformationDesk();
+	if (type == PA_INFORMATION_CENTER) return new InformationCenter();
 
 	std::cerr << "Cannot create new ParkAsset of type \"" << type << "\"" << std::endl;
 }
