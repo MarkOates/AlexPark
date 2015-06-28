@@ -9,8 +9,24 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include <algorithm>
 
 #define TAU (ALLEGRO_PI * 2)
+
+
+void draw_ustr_chr(int32_t ustr_char, float x, float y, float align_x, float align_y, ALLEGRO_COLOR color, ALLEGRO_FONT *font)
+{
+	if (!font) return;
+	ALLEGRO_USTR *ustr = al_ustr_new("");
+	al_ustr_set_chr(ustr, 0, ustr_char);
+	al_draw_ustr(font, color,
+		x - al_get_ustr_width(font, ustr) * align_x,
+		y - al_get_font_ascent(font) * align_y,
+		0,
+		ustr); 
+	al_ustr_free(ustr);
+}
+
 
 #include "color_encode_id.h"
 #include "vec3d.h"
@@ -41,6 +57,8 @@ public:
 	int mouse_x, mouse_y;
 	int ground_x, ground_y;
 
+	ALLEGRO_BITMAP *asset_plot_shadow;
+
 	Project(ALLEGRO_DISPLAY *display)
 		: display(display)
 		, pointer_target_buffer(al_create_bitmap(al_get_display_width(display), al_get_display_height(display)))
@@ -54,18 +72,22 @@ public:
 		, mouse_y(0)
 		, ground_x(0)
 		, ground_y(0)
+		, asset_plot_shadow(al_load_bitmap("data/bitmaps/plot_shadow.png"))
 	{
 		camera.zoom_pos -= 1.0;
 		camera.position.x += 20;
 		camera.position.y -= 10;
-		for (unsigned i=0; i<3; i++)
+		for (unsigned i=0; i<1; i++)
 		{
+			/*
 			park.assets.push_back(new ConcessionStand());
 			park.assets[i]->set_texture(texture);
 			park.assets[i]->position.x = 16 + i*2;
 			park.assets[i]->position.z = 16;
+			park.money -= park.assets[i]->initial_cost;
+			*/
+			park.purchase_ConcessionStand(16, 16);
 		}
-
 	}
 
 	void refresh_ground_render_surface()
@@ -74,7 +96,7 @@ public:
 		al_store_state(&previous_state, ALLEGRO_STATE_TARGET_BITMAP | ALLEGRO_STATE_BLENDER);
 		al_set_target_bitmap(ground.render_surface);		
 
-		al_clear_to_color(al_color_name("orange"));
+		al_clear_to_color(al_color_html("689f41"));
 		float x_scale = al_get_bitmap_width(ground.render_surface) / (float)ground.w;
 		float y_scale = al_get_bitmap_height(ground.render_surface) / (float)ground.h;
 
@@ -83,11 +105,23 @@ public:
 		// draw the cursor
 		if (ground_x >= 0)
 		{
+			
 			al_draw_circle(ground_x * x_scale + x_scale/2, ground_y * y_scale + x_scale/2,
-				16, al_color_name("black"), 3.0);
-			al_draw_filled_rectangle(ground_x * x_scale, ground_y * y_scale,
+				16, al_map_rgba_f(0.1, 0.1, 0.1, 0.1), 3.0);
+			al_draw_rectangle(ground_x * x_scale, ground_y * y_scale,
 				ground_x * x_scale + x_scale, ground_y * y_scale + y_scale,
-				al_color_name("yellow"));
+				al_color_name("orange"), 3);
+			//al_draw_filled_rectangle(ground_x * x_scale, ground_y * y_scale,
+			//	ground_x * x_scale + x_scale, ground_y * y_scale + y_scale,
+			//	al_color_name("yellow"));
+		}
+
+		// draw the nice eyecandy shadows
+		for (unsigned i=0; i<park.assets.size(); i++)
+		{
+			int x = park.assets[i]->position.x * x_scale;
+			int y = park.assets[i]->position.z * y_scale;
+			al_draw_bitmap(asset_plot_shadow, x-8, y-8, 0);
 		}
 
 		al_restore_state(&previous_state);
@@ -95,6 +129,13 @@ public:
 
 	void on_timer()
 	{
+		//
+		// update the park
+		//
+
+		park.update();
+
+
 		//
 		// this draws the ids as colors into a buffer
 		//
@@ -139,7 +180,7 @@ public:
 		refresh_ground_render_surface();
 
 		camera.setup_camera_perspective(al_get_backbuffer(display));
-		al_clear_to_color(al_color_name("gray"));
+		al_clear_to_color(al_color_name("dodgerblue"));
 		al_clear_depth_buffer(1000);
 
 		ground.draw();
@@ -187,10 +228,7 @@ public:
 	{
 		if (ground_x < 0 || ground_y < 0) return;
 
-		park.assets.push_back(new ConcessionStand());
-		park.assets.back()->position.x = ground_x;
-		park.assets.back()->position.z = ground_y;
-		park.assets.back()->set_texture(texture);
+		park.purchase_ConcessionStand(ground_x, ground_y);
 	}
 };
 
@@ -217,7 +255,7 @@ int main(int argc, char* argv[])
 	// create the display
 	al_set_new_display_option(ALLEGRO_DEPTH_SIZE, 32, ALLEGRO_SUGGEST);
 	al_set_new_display_option(ALLEGRO_SUPPORT_NPOT_BITMAP, 0, ALLEGRO_REQUIRE);
-	ALLEGRO_DISPLAY *display = al_create_display(800, 600);
+	ALLEGRO_DISPLAY *display = al_create_display(1200, 800);
 
 	al_register_event_source(event_queue, al_get_timer_event_source(timer));
 	al_register_event_source(event_queue, al_get_mouse_event_source());	

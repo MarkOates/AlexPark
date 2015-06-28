@@ -9,6 +9,7 @@ private:
 public:
 	// labels
 	std::string type;
+	ALLEGRO_COLOR color;
 	int id;
 
 	// dimentions
@@ -29,15 +30,24 @@ public:
 	float initial_cost;
 
 	// expenses
-	float expense;
-	int num_employees;
-	float initial_hype;
-	float hype_depreciation;
-	float radius_of_influence;
-	float time_per_customer;
+	float expense_per_turn;
+	int max_num_customers_served;
+	float customer_happiness_created;
+	float profit;
+	float num_customers_brought_to_park;
+
+	// state(2)
+	int num_customers_served_this_turn;
+
+	bool tapped()
+	{
+		if (num_customers_served_this_turn >= max_num_customers_served) return true;
+		return false;
+	}
 
 	ParkAsset()
 		: type("")
+		, color(al_color_name("white"))
 		, id(++last_id)
 		, position(0, 0, 0)
 		, rotation_y(0)
@@ -48,36 +58,70 @@ public:
 		, indexes()
 		, texture(NULL)
 		, initial_cost(0)
-		, expense(0)
-		, num_employees(0)
-		, initial_hype(0)
-		, hype_depreciation(0)
-		, radius_of_influence(0)
-		, time_per_customer(0)
+		, expense_per_turn(0)
+		, max_num_customers_served(0)
+		, customer_happiness_created(0)
+		, profit(0)
+		, num_customers_brought_to_park(0)
+		, num_customers_served_this_turn(0)
 	{
+		build_model();
 	}
 
-	virtual void build_model() {}
+	virtual void build_model()
+	{
+		vertexes.clear();
+		indexes.clear();
+		//ALLEGRO_COLOR c = (use_id) ? encode_id(id) : (hovered ? al_color_name("yellow") : al_map_rgb_f(1, 1, 1));
 
+		ALLEGRO_COLOR c = al_color_name("white");
+		ALLEGRO_TRANSFORM t;
+		ALLEGRO_VERTEX vtx[5] = {
+		/*   x   y   z   u   v  c  */
+			{ 0,  1,  0,  0, 64, c},
+			{-0.5, 0, -0.5,  0,  0, c},
+			{ 0.5, 0, -0.5, 64, 64, c},
+			{ 0.5, 0,  0.5, 64,  0, c},
+			{-0.5, 0,  0.5, 64, 64, c},
+		};
+		int indices[12] = {
+			0, 1, 2,
+			0, 2, 3,
+			0, 3, 4,
+			0, 4, 1
+		};
+
+		for (unsigned i=0; i<5; i++)
+		{
+			vtx[i].x += 0.5;
+			vtx[i].z += 0.5;
+		}	
+
+		// transfer the vtxs to vertexes
+		for (unsigned i=0; i<5; i++)
+			vertexes.push_back(vtx[i]);
+
+		for (unsigned i=0; i<12; i++)
+			indexes.push_back(indices[i]);
+	}
 	void set_texture(ALLEGRO_BITMAP *tx)
 	{
 		texture = tx;
 	}
 
-	void set_color(ALLEGRO_COLOR color)
+	void set_color(ALLEGRO_COLOR col)
 	{
 		for (unsigned i=0; i<vertexes.size(); i++)
-			vertexes[i].color = color;
+			vertexes[i].color = col;
 	}
 
 	void draw(bool use_id=false)
 	{
 		if (vertexes.empty() || indexes.empty()) return;
 
-		return;
 		if (use_id) set_color(encode_id(id));
 		else if (hovered) set_color(al_color_name("yellow"));
-		else set_color(al_color_name("white"));
+		else set_color(color);
 
 
 		ALLEGRO_STATE prev_state;
@@ -92,7 +136,7 @@ public:
 
 		al_restore_state(&prev_state);
 	}
-
+/*
 	virtual void draw_cube(bool use_id=false)
 	{
 		ALLEGRO_COLOR c = (use_id) ? encode_id(id) : (hovered ? al_color_name("yellow") : al_map_rgb_f(1, 1, 1));
@@ -176,6 +220,7 @@ public:
 
 		al_restore_state(&prev_state);
 	}
+*/
 };
 int ParkAsset::last_id = 0;
 
@@ -188,57 +233,16 @@ public:
 		: ParkAsset()
 	{
 		type = "Concession Stand";
-		position = vec3d(0, 0, 0);
-		rotation_y = 0;
-		width = 2;
-		height = 2;
 		texture = NULL;
-		initial_cost = 0;
-		expense = 0;
-		num_employees = 0;
-		initial_hype = 0;
-		hype_depreciation = 0;
-		radius_of_influence = 0;
-		time_per_customer = 0;
+		color = al_color_name("darkslategray");
 
-		build_model();
-	}
+		initial_cost = 500;
 
-	void build_model() override
-	{
-		vertexes.clear();
-		indexes.clear();
-		//ALLEGRO_COLOR c = (use_id) ? encode_id(id) : (hovered ? al_color_name("yellow") : al_map_rgb_f(1, 1, 1));
-
-		ALLEGRO_COLOR c = al_color_name("white");
-		ALLEGRO_TRANSFORM t;
-		ALLEGRO_VERTEX vtx[5] = {
-		/*   x   y   z   u   v  c  */
-			{ 0,  1,  0,  0, 64, c},
-			{-0.5, 0, -0.5,  0,  0, c},
-			{ 0.5, 0, -0.5, 64, 64, c},
-			{ 0.5, 0,  0.5, 64,  0, c},
-			{-0.5, 0,  0.5, 64, 64, c},
-		};
-		int indices[12] = {
-			0, 1, 2,
-			0, 2, 3,
-			0, 3, 4,
-			0, 4, 1
-		};
-
-		for (unsigned i=0; i<5; i++)
-		{
-			vtx[i].x += 0.5;
-			vtx[i].z += 0.5;
-		}	
-
-		// transfer the vtxs to vertexes
-		for (unsigned i=0; i<5; i++)
-			vertexes.push_back(vtx[i]);
-
-		for (unsigned i=0; i<12; i++)
-			indexes.push_back(indices[i]);
+		expense_per_turn = 1;
+		max_num_customers_served = 3;
+		customer_happiness_created = 0;
+		profit = 3;
+		num_customers_brought_to_park = 1;
 	}
 };
 
