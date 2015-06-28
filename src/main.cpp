@@ -40,6 +40,7 @@ public:
 	Ground ground;
 
 	int mouse_x, mouse_y;
+	int ground_x, ground_y;
 
 	Project(ALLEGRO_DISPLAY *display)
 		: display(display)
@@ -49,9 +50,11 @@ public:
 		, hud(display, &park)
 		, abort_game(false)
 		, texture(al_load_bitmap("data/bitmaps/stone.png"))
-		, ground(32, 32, al_load_bitmap("data/bitmaps/grass_256.png"))
+		, ground(32, 32)
 		, mouse_x(0)
 		, mouse_y(0)
+		, ground_x(0)
+		, ground_y(0)
 	{
 		for (unsigned i=0; i<6; i++)
 		{
@@ -61,6 +64,32 @@ public:
 			std::cout << i << " " << park.assets[i]->id << std::endl;
 		}
 	}
+
+	void refresh_ground_render_surface()
+	{
+		ALLEGRO_STATE previous_state;
+		al_store_state(&previous_state, ALLEGRO_STATE_TARGET_BITMAP | ALLEGRO_STATE_BLENDER);
+		al_set_target_bitmap(ground.render_surface);		
+
+		al_clear_to_color(al_color_name("orange"));
+		float x_scale = al_get_bitmap_width(ground.render_surface) / (float)ground.w;
+		float y_scale = al_get_bitmap_height(ground.render_surface) / (float)ground.h;
+
+		//al_draw_filled_rectangle(0, 0, 2000, 2000, al_color_name("green"));
+
+		// draw the cursor
+		if (ground_x >= 0)
+		{
+			al_draw_circle(ground_x * x_scale + x_scale/2, ground_y * y_scale + x_scale/2,
+				16, al_color_name("black"), 3.0);
+			al_draw_filled_rectangle(ground_x * x_scale, ground_y * y_scale,
+				ground_x * x_scale + x_scale, ground_y * y_scale + y_scale,
+				al_color_name("pink"));
+		}
+
+		al_restore_state(&previous_state);
+	}
+
 	void on_timer()
 	{
 		//
@@ -71,7 +100,6 @@ public:
 		al_clear_to_color(al_color_name("black"));
 		al_clear_depth_buffer(1000);
 
-		ground.fit_and_use_texture(ground.remap_coordinates_texture);
 		ground.draw(true);
 
 		park.draw(true);
@@ -85,13 +113,16 @@ public:
 		ALLEGRO_COLOR pointed_pixel_value = al_get_pixel(pointer_target_buffer, mouse_x, mouse_y);
 		int hovered_asset_id = decode_id(pointed_pixel_value);
 
+		ground_x = -1;
+		ground_y = -1;
 		if (hovered_asset_id >= 1000)
 		{
-			int x, y;
-			ground.unmap_texture_coordinates(hovered_asset_id, 1000, &x, &y);
+			ground.unmap_texture_coordinates(hovered_asset_id, 1000, &ground_x, &ground_y);
 			//al_set_target_bitmap(ground.texture);
 			//al_put_pixel(x, y, al_color_name("dodgerblue"));
 		}
+
+		//render_ground();
 
 		// set the park asset as "hovered"
 		for (unsigned i=0; i<park.assets.size(); i++)
@@ -102,11 +133,12 @@ public:
 		// this draws the actual scene
 		//
 
+		refresh_ground_render_surface();
+
 		camera.setup_camera_perspective(al_get_backbuffer(display));
 		al_clear_to_color(al_color_name("gray"));
 		al_clear_depth_buffer(1000);
 
-		ground.fit_and_use_texture(ground.texture);
 		ground.draw();
 
 		park.draw();	
@@ -148,7 +180,15 @@ public:
 		mouse_y = ev.mouse.y;
 	}
 	void on_mouse_up() {}
-	void on_mouse_down() {}
+	void on_mouse_down()
+	{
+		if (ground_x < 0 || ground_y < 0) return;
+
+		park.assets.push_back(new ParkAsset());
+		park.assets.back()->position.x = ground_x;
+		park.assets.back()->position.z = ground_y;
+		park.assets.back()->set_texture(texture);
+	}
 };
 
 

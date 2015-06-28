@@ -5,24 +5,24 @@ class Ground
 public:
 	int w;
 	int h;
-	ALLEGRO_BITMAP *texture, *remap_coordinates_texture;
+	ALLEGRO_BITMAP *render_surface, *remap_coordinates_texture;
 	ALLEGRO_VERTEX vertexes[4];
 
-	Ground(int w, int h, ALLEGRO_BITMAP *surface_texture)
+	Ground(int w, int h)
 		: w(w)
 		, h(h)
-		, texture(surface_texture)
+		, render_surface(al_create_bitmap(512, 512))
 		, remap_coordinates_texture(create_remapable_texture(w, h, 1000))
 		, vertexes({
-				{-w/2.0f, 0, -h/2.0f, 0, 0, al_color_name("white")},
-				{-w/2.0f, 0, h/2.0f, 0, (float)h, al_color_name("white")},
-				{w/2.0f, 0, h/2.0f, (float)w, (float)h, al_color_name("white")},
-				{w/2.0f, 0, -h/2.0f, (float)w, 0, al_color_name("white")}
+				{0, 0, 0, 0, 0, al_color_name("white")},
+				{0, 0, (float)h, 0, (float)h, al_color_name("white")},
+				{(float)w, 0, (float)h, (float)w, (float)h, al_color_name("white")},
+				{(float)w, 0, 0, (float)w, 0, al_color_name("white")}
 		})
 	{
 	}
 
-	void fit_and_use_texture(ALLEGRO_BITMAP *bmp, int tile_n_times=8)
+	void fit_and_use_texture(ALLEGRO_BITMAP *bmp, int tile_n_times=1)
 	{
 		int w = al_get_bitmap_width(bmp);
 		int h = al_get_bitmap_height(bmp);
@@ -65,12 +65,12 @@ public:
 		*y = id / w;
 	}	
 
-
 	void draw(bool use_id=false)
 	{
-		al_draw_prim(&vertexes, NULL, use_id ? remap_coordinates_texture : texture, 0, 4, ALLEGRO_PRIM_TRIANGLE_FAN);
+		if (use_id) fit_and_use_texture(remap_coordinates_texture);
+		else fit_and_use_texture(render_surface);
+		al_draw_prim(&vertexes, NULL, use_id ? remap_coordinates_texture : render_surface, 0, 4, ALLEGRO_PRIM_TRIANGLE_FAN);
 	}
-
 };
 
 
