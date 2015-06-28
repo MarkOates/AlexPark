@@ -12,6 +12,7 @@ public:
 	int employees;
 
 	std::vector<ParkAsset *> assets;
+	int hovered_asset_id;
 	HeatMap traffic_map;
 
 	Park()
@@ -20,6 +21,7 @@ public:
 		, visitor_happiness(0)
 		, employees(0)
 		, assets()
+		, hovered_asset_id(0)
 		, traffic_map()
 	{
 	}
@@ -82,6 +84,14 @@ public:
 		al_draw_filled_rounded_rectangle(al_get_display_width(display)-350, 10, al_get_display_width(display)-10, 60, 16, 12, al_map_rgba_f(0, 0, 0, 0.2));
 		al_draw_textf(font, color, al_get_display_width(display)-200, 20, ALLEGRO_ALIGN_RIGHT, "happiness: %d", park.visitor_happiness);
 		al_draw_textf(font, color, al_get_display_width(display)-20, 20, ALLEGRO_ALIGN_RIGHT, "employees: %d", park.employees);
+
+		ParkAsset *asset = park.get_asset_by_id(park.hovered_asset_id);
+		if (asset)
+		{
+			// this shows info about the current item that is selected
+			al_draw_textf(font, color, al_get_display_width(display)/2, al_get_display_height(display)-40, ALLEGRO_ALIGN_CENTER,
+				"%s %d", asset->type.c_str(), asset->id);
+		}
 	}
 };
 

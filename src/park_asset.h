@@ -8,7 +8,7 @@ private:
 
 public:
 	// labels
-	int type;
+	std::string type;
 	int id;
 
 	// dimentions
@@ -37,7 +37,7 @@ public:
 	float time_per_customer;
 
 	ParkAsset()
-		: type(0)
+		: type("")
 		, id(++last_id)
 		, position(0, 0, 0)
 		, rotation_y(0)
@@ -54,11 +54,43 @@ public:
 		, hype_depreciation(0)
 		, radius_of_influence(0)
 		, time_per_customer(0)
-	{}
+	{
+	}
+
+	virtual void build_model() {}
 
 	void set_texture(ALLEGRO_BITMAP *tx)
 	{
 		texture = tx;
+	}
+
+	void set_color(ALLEGRO_COLOR color)
+	{
+		for (unsigned i=0; i<vertexes.size(); i++)
+			vertexes[i].color = color;
+	}
+
+	void draw(bool use_id=false)
+	{
+		if (vertexes.empty() || indexes.empty()) return;
+
+		return;
+		if (use_id) set_color(encode_id(id));
+		else if (hovered) set_color(al_color_name("yellow"));
+		else set_color(al_color_name("white"));
+
+
+		ALLEGRO_STATE prev_state;
+		al_store_state(&prev_state, ALLEGRO_STATE_TRANSFORM);
+		ALLEGRO_TRANSFORM t;
+
+		al_identity_transform(&t);
+		al_rotate_transform_3d(&t, 0, 1, 0, rotation_y);
+		al_translate_transform_3d(&t, position.x, position.y, position.z);
+		al_use_transform(&t);
+		al_draw_indexed_prim(&vertexes[0], NULL, use_id ? NULL : texture, &indexes[0], indexes.size(), ALLEGRO_PRIM_TRIANGLE_LIST);
+
+		al_restore_state(&prev_state);
 	}
 
 	virtual void draw_cube(bool use_id=false)
@@ -109,13 +141,11 @@ public:
 
 		al_restore_state(&prev_state);
 	}
-
-	virtual void draw(bool use_id=false)
+	virtual void draw_pyramid(bool use_id=false)
 	{
 		ALLEGRO_COLOR c = (use_id) ? encode_id(id) : (hovered ? al_color_name("yellow") : al_map_rgb_f(1, 1, 1));
 		ALLEGRO_TRANSFORM t;
 		ALLEGRO_VERTEX vtx[5] = {
-		/*   x   y   z   u   v  c  */
 			{ 0,  1,  0,  0, 64, c},
 			{-0.5, 0, -0.5,  0,  0, c},
 			{ 0.5, 0, -0.5, 64, 64, c},
@@ -148,6 +178,71 @@ public:
 	}
 };
 int ParkAsset::last_id = 0;
+
+
+
+class ConcessionStand : public ParkAsset
+{
+public:
+	ConcessionStand()
+		: ParkAsset()
+	{
+		type = "Concession Stand";
+		position = vec3d(0, 0, 0);
+		rotation_y = 0;
+		width = 2;
+		height = 2;
+		texture = NULL;
+		initial_cost = 0;
+		expense = 0;
+		num_employees = 0;
+		initial_hype = 0;
+		hype_depreciation = 0;
+		radius_of_influence = 0;
+		time_per_customer = 0;
+
+		build_model();
+	}
+
+	void build_model() override
+	{
+		vertexes.clear();
+		indexes.clear();
+		//ALLEGRO_COLOR c = (use_id) ? encode_id(id) : (hovered ? al_color_name("yellow") : al_map_rgb_f(1, 1, 1));
+
+		ALLEGRO_COLOR c = al_color_name("white");
+		ALLEGRO_TRANSFORM t;
+		ALLEGRO_VERTEX vtx[5] = {
+		/*   x   y   z   u   v  c  */
+			{ 0,  1,  0,  0, 64, c},
+			{-0.5, 0, -0.5,  0,  0, c},
+			{ 0.5, 0, -0.5, 64, 64, c},
+			{ 0.5, 0,  0.5, 64,  0, c},
+			{-0.5, 0,  0.5, 64, 64, c},
+		};
+		int indices[12] = {
+			0, 1, 2,
+			0, 2, 3,
+			0, 3, 4,
+			0, 4, 1
+		};
+
+		for (unsigned i=0; i<5; i++)
+		{
+			vtx[i].x += 0.5;
+			vtx[i].z += 0.5;
+		}	
+
+		// transfer the vtxs to vertexes
+		for (unsigned i=0; i<5; i++)
+			vertexes.push_back(vtx[i]);
+
+		for (unsigned i=0; i<12; i++)
+			indexes.push_back(indices[i]);
+	}
+};
+
+
 
 
 

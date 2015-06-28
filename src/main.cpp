@@ -36,7 +36,6 @@ public:
 	bool abort_game;
 
 	ALLEGRO_BITMAP *texture;
-	//ParkAsset park_assets[6];
 	Ground ground;
 
 	int mouse_x, mouse_y;
@@ -56,13 +55,17 @@ public:
 		, ground_x(0)
 		, ground_y(0)
 	{
-		for (unsigned i=0; i<6; i++)
+		camera.zoom_pos -= 1.0;
+		camera.position.x += 20;
+		camera.position.y -= 10;
+		for (unsigned i=0; i<3; i++)
 		{
-			park.assets.push_back(new ParkAsset());
+			park.assets.push_back(new ConcessionStand());
 			park.assets[i]->set_texture(texture);
-			park.assets[i]->position.x = i*2;
-			std::cout << i << " " << park.assets[i]->id << std::endl;
+			park.assets[i]->position.x = 16 + i*2;
+			park.assets[i]->position.z = 16;
 		}
+
 	}
 
 	void refresh_ground_render_surface()
@@ -84,7 +87,7 @@ public:
 				16, al_color_name("black"), 3.0);
 			al_draw_filled_rectangle(ground_x * x_scale, ground_y * y_scale,
 				ground_x * x_scale + x_scale, ground_y * y_scale + y_scale,
-				al_color_name("pink"));
+				al_color_name("yellow"));
 		}
 
 		al_restore_state(&previous_state);
@@ -111,13 +114,13 @@ public:
 
 		// set the current hovered_asset_id
 		ALLEGRO_COLOR pointed_pixel_value = al_get_pixel(pointer_target_buffer, mouse_x, mouse_y);
-		int hovered_asset_id = decode_id(pointed_pixel_value);
+		park.hovered_asset_id = decode_id(pointed_pixel_value);
 
 		ground_x = -1;
 		ground_y = -1;
-		if (hovered_asset_id >= 1000)
+		if (park.hovered_asset_id >= 1000)
 		{
-			ground.unmap_texture_coordinates(hovered_asset_id, 1000, &ground_x, &ground_y);
+			ground.unmap_texture_coordinates(park.hovered_asset_id, 1000, &ground_x, &ground_y);
 			//al_set_target_bitmap(ground.texture);
 			//al_put_pixel(x, y, al_color_name("dodgerblue"));
 		}
@@ -126,7 +129,7 @@ public:
 
 		// set the park asset as "hovered"
 		for (unsigned i=0; i<park.assets.size(); i++)
-			park.assets[i]->hovered = (park.assets[i]->id == hovered_asset_id);
+			park.assets[i]->hovered = (park.assets[i]->id == park.hovered_asset_id);
 
 
 		//
@@ -184,7 +187,7 @@ public:
 	{
 		if (ground_x < 0 || ground_y < 0) return;
 
-		park.assets.push_back(new ParkAsset());
+		park.assets.push_back(new ConcessionStand());
 		park.assets.back()->position.x = ground_x;
 		park.assets.back()->position.z = ground_y;
 		park.assets.back()->set_texture(texture);
