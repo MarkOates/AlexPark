@@ -7,6 +7,7 @@
 #include <allegro5/allegro_ttf.h>
 
 #include <string>
+#include <map>
 #include <vector>
 #include <iostream>
 #include <algorithm>
@@ -14,11 +15,17 @@
 #define TAU (ALLEGRO_PI * 2)
 
 
-void draw_ustr_chr(int32_t ustr_char, float x, float y, float align_x, float align_y, ALLEGRO_COLOR color, ALLEGRO_FONT *font)
+void draw_ustr_chr(int32_t ustr_char, float x, float y, float align_x, float align_y, ALLEGRO_COLOR color, ALLEGRO_FONT *font, bool shaded = true)
 {
 	if (!font) return;
 	ALLEGRO_USTR *ustr = al_ustr_new("");
 	al_ustr_set_chr(ustr, 0, ustr_char);
+	if (shaded)
+	al_draw_ustr(font, al_map_rgba_f(0, 0, 0, 0.3),
+		x - al_get_ustr_width(font, ustr) * align_x + 2,
+		y - al_get_font_line_height(font) * align_y + 3,
+		0,
+		ustr); 
 	al_draw_ustr(font, color,
 		x - al_get_ustr_width(font, ustr) * align_x,
 		y - al_get_font_line_height(font) * align_y,
@@ -61,6 +68,7 @@ public:
 
 	ALLEGRO_BITMAP *asset_plot_shadow;
 	ALLEGRO_BITMAP *grass_texture;
+	ALLEGRO_BITMAP *stone_walkway;
 
 	Project(ALLEGRO_DISPLAY *display)
 		: display(display)
@@ -77,6 +85,7 @@ public:
 		, ground_y(0)
 		, asset_plot_shadow(al_load_bitmap("data/bitmaps/plot_shadow.png"))
 		, grass_texture(generate_noise_bitmap(1024, 1024, al_color_html("89ae58"), al_color_html("6e943c")))
+		, stone_walkway(al_load_bitmap("data/bitmaps/stone_walkway.png"))
 	{
 		// set the camera position to nice and wide
 		camera.zoom_pos -= 1.0;
@@ -100,6 +109,8 @@ public:
 		float y_scale = al_get_bitmap_height(ground.render_surface) / (float)ground.h;
 
 		al_draw_bitmap(grass_texture, 0, 0, 0);
+
+		// draw the stone_walkways
 
 //		for (unsigned y=0; y<ground.h; y++)
 //			for (unsigned x=0; x<ground.w; x++)
@@ -166,7 +177,7 @@ public:
 		ground_x = -1;
 		ground_y = -1;
 		hud.hovered_ui_id = -1;
-		if (park.hovered_asset_id > 40000) // gui
+		if (park.hovered_asset_id >= 40000) // gui
 		{
 			hud.hovered_ui_id = park.hovered_asset_id - 40000;
 		}
@@ -231,6 +242,9 @@ public:
 				// the mouse is pointing at
 				al_save_bitmap("pointer_buffer.bmp", pointer_target_buffer);
 				break;
+			case ALLEGRO_KEY_M:
+				hud.toggle_asset_window();
+				break;
 		}
 	}
 	void on_key_up() {}
@@ -243,6 +257,9 @@ public:
 	void on_mouse_up() {}
 	void on_mouse_down()
 	{
+		std::cout << hud.hovered_ui_id << std::endl;
+		hud.activate_ui(hud.hovered_ui_id);
+		
 		if (ground_x < 0 || ground_y < 0) return;
 
 		park.purchase_asset(hud.get_current_selected_asset(), ground_x, ground_y);

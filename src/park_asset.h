@@ -16,6 +16,7 @@ public:
 	std::string type;
 	ALLEGRO_COLOR color;
 	int32_t icon_char; 
+	ALLEGRO_COLOR icon_color;
 	int id;
 
 	// dimentions
@@ -33,7 +34,7 @@ public:
 	ALLEGRO_BITMAP *texture;
 
 	// cost
-	float initial_cost;
+	int initial_cost;
 
 	// expenses
 	float expense_per_turn;
@@ -53,8 +54,9 @@ public:
 
 	ParkAsset()
 		: type("")
-		, color(al_color_name("white"))
-		, icon_char(0xf15a)
+		, color(al_color_name("gray"))
+		, icon_char(0xf1b2)
+		, icon_color(al_color_name("white"))
 		, id(++last_id)
 		, position(0, 0, 0)
 		, rotation_y(0)
@@ -72,14 +74,13 @@ public:
 		, num_customers_brought_to_park(0)
 		, num_customers_served_this_turn(0)
 	{
-		build_model();
+		build_pyramid();
 	}
 
-	virtual void build_model()
+	void build_pyramid()
 	{
 		vertexes.clear();
 		indexes.clear();
-		//ALLEGRO_COLOR c = (use_id) ? encode_id(id) : (hovered ? al_color_name("yellow") : al_map_rgb_f(1, 1, 1));
 
 		ALLEGRO_COLOR c = al_color_name("white");
 		ALLEGRO_TRANSFORM t;
@@ -111,6 +112,75 @@ public:
 		for (unsigned i=0; i<12; i++)
 			indexes.push_back(indices[i]);
 	}
+
+	void build_tall_cube()
+	{
+		build_cube();
+		for (unsigned i=0; i<vertexes.size(); i++)
+			vertexes[i].y *= 2;
+	}
+
+	void build_small_cube()
+	{
+		build_cube();
+		for (unsigned i=0; i<vertexes.size(); i++)
+		{
+			vertexes[i].x *= 0.5;
+			vertexes[i].y *= 0.5;
+			vertexes[i].z *= 0.5;
+			vertexes[i].x += 0.25;
+			vertexes[i].z += 0.25;
+		}
+	}
+
+	void build_cube()
+	{
+		vertexes.clear();
+		indexes.clear();
+
+		ALLEGRO_COLOR c = al_color_name("white");
+		ALLEGRO_TRANSFORM t;
+		float txw = 32;
+		float txh = 32;
+		ALLEGRO_VERTEX vtx[8] = {
+			{ 0.500000, 0.000000, -0.500000, txw, 0, c },
+			{ 0.500000, 0.000000, 0.500000, txw, txh, c },
+			{ -0.500000, 0.000000, 0.500000, 0, txh, c },
+			{ -0.500000, 0.000000, -0.500000, 0, 0, c },
+			{ 0.500000, 1.000000, -0.500000, 0, 0, c },
+			{ 0.500000, 1.000000, 0.500000, 0, 0, c },
+			{ -0.500000, 1.000000, 0.500000, 0, 0, c },
+			{ -0.500000, 1.000000, -0.500000, 0, 0, c }
+		};
+		int indices[36] = {
+			1-1, 2-1, 3-1,
+			1-1, 3-1, 4-1,
+			5-1, 8-1, 7-1,
+			5-1, 7-1, 6-1,
+			1-1, 5-1, 6-1,
+			1-1, 6-1, 2-1,
+			2-1, 6-1, 7-1,
+			2-1, 7-1, 3-1,
+			3-1, 7-1, 8-1,
+			3-1, 8-1, 4-1,
+			5-1, 1-1, 4-1,
+			5-1, 4-1, 8-1
+		};
+
+		for (unsigned i=0; i<8; i++)
+		{
+			vtx[i].x += 0.5;
+			vtx[i].z += 0.5;
+		}
+
+		// transfer the vtxs to vertexes
+		for (unsigned i=0; i<8; i++)
+			vertexes.push_back(vtx[i]);
+
+		for (unsigned i=0; i<36; i++)
+			indexes.push_back(indices[i]);
+	}
+
 	void set_texture(ALLEGRO_BITMAP *tx)
 	{
 		texture = tx;
@@ -245,10 +315,10 @@ public:
 
 
 #define PA_CONCESSION_STAND "Concession Stand"
-#define PA_PARK_ENTRANCE "Park Entrance"
+#define PA_WALKWAY "Walkway"
 #define PA_MERRY_GO_ROUND "Merry-Go-Round"
 #define PA_ROLLER_COASTER "Roller Coaster"
-#define PA_BUSH "Bush"
+#define PA_TREE "Tree"
 #define PA_HORROR_HOUSE "Horror House"
 #define PA_CRAZY_LAND "Crazy Land"
 #define PA_INFORMATION_CENTER "Information Center"
@@ -271,6 +341,8 @@ public:
 		type = PA_CONCESSION_STAND;
 		texture = NULL;
 		color = al_color_name("antiquewhite");
+		icon_char = 0xf0f5;
+		icon_color = al_color_name("brown");
 
 		initial_cost = 500;
 
@@ -279,20 +351,24 @@ public:
 		customer_happiness_created = 0;
 		profit = 3;
 		num_customers_brought_to_park = 1;
+
+		build_cube();
 	}
 };
 
 
 
-class ParkEntrance : public ParkAsset
+class Walkway : public ParkAsset
 {
 public:
-	ParkEntrance()
+	Walkway()
 		: ParkAsset()
 	{
-		type = PA_PARK_ENTRANCE;
+		type = PA_WALKWAY;
 		texture = NULL;
-		color = al_color_name("pink");
+		color = al_color_name("green");
+		icon_char = 0xf018;
+		icon_color = al_color_name("gray");
 
 		initial_cost = 0;
 
@@ -301,6 +377,9 @@ public:
 		customer_happiness_created = 0;
 		profit = 0;
 		num_customers_brought_to_park = 0;
+
+		vertexes.clear();
+		indexes.clear();
 	}
 };
 
@@ -315,6 +394,8 @@ public:
 		type = PA_MERRY_GO_ROUND;
 		texture = NULL;
 		color = al_color_name("orange");
+		icon_char = 0xf052;
+		icon_color = al_color_name("beige");
 
 		initial_cost = 500;
 
@@ -337,6 +418,8 @@ public:
 		type = PA_ROLLER_COASTER;
 		texture = NULL;
 		color = al_color_name("red");
+		icon_char = 0xf135;
+		icon_color = al_color_name("yellow");
 
 		initial_cost = 8000;
 
@@ -350,17 +433,19 @@ public:
 
 
 
-class Bush : public ParkAsset
+class Tree : public ParkAsset
 {
 public:
-	Bush()
+	Tree()
 		: ParkAsset()
 	{
-		type = PA_BUSH;
+		type = PA_TREE;
 		texture = NULL;
-		color = al_color_name("chartreuce");
+		color = al_color_html("46752d");
+		icon_char = 0xf1bb;
+		icon_color = al_color_html("6ba342");
 
-		initial_cost = 200;
+		initial_cost = 100;
 
 		expense_per_turn = 0;
 		max_num_customers_served = 1;
@@ -381,6 +466,8 @@ public:
 		type = PA_HORROR_HOUSE;
 		texture = NULL;
 		color = al_color_name("darkslategray");
+		icon_char = 0xf1ad;
+		icon_color = al_color_name("darkcyan");
 
 		initial_cost = 5000;
 
@@ -403,6 +490,8 @@ public:
 		type = PA_CRAZY_LAND;
 		texture = NULL;
 		color = al_color_name("deeppink");
+		icon_char = 0xf140;
+		icon_color = al_color_name("yellow");
 
 		initial_cost = 5000;
 
@@ -425,6 +514,8 @@ public:
 		type = PA_INFORMATION_CENTER;
 		texture = NULL;
 		color = al_color_name("dodgerblue");
+		icon_char = 0xf05a;
+		icon_color = al_color_name("aliceblue");
 
 		initial_cost = 2000;
 
@@ -446,7 +537,9 @@ public:
 	{
 		type = PA_PUBLIC_RESTROOMS;
 		texture = NULL;
-		color = al_color_name("gray");
+		color = al_color_name("beige");
+		icon_char = 0xf183;
+		icon_color = al_color_name("darkblue");
 
 		initial_cost = 1500;
 
@@ -468,7 +561,10 @@ public:
 	{
 		type = PA_WATER_FOUNTAIN;
 		texture = NULL;
-		color = al_color_name("white");
+		color = al_color_name("lightslategray");
+		icon_char = 0xf043;
+		icon_color = al_color_name("lightskyblue");
+		
 
 		initial_cost = 500;
 
@@ -477,6 +573,8 @@ public:
 		customer_happiness_created = 2;
 		profit = 0;
 		num_customers_brought_to_park = 0;
+
+		build_small_cube();
 	}
 };
 
@@ -553,6 +651,7 @@ public:
 		type = PA_FERRIS_WHEEL;
 		texture = NULL;
 		color = al_color_name("powderblue");
+		icon_char = 0xf185;
 
 		initial_cost = 10000;
 
@@ -594,15 +693,15 @@ public:
 ParkAsset *FACTORY_create_asset(std::string type)
 {
 	if (type == PA_CONCESSION_STAND) return new ConcessionStand();
-	if (type == PA_PARK_ENTRANCE) return new ParkEntrance();
+	if (type == PA_WALKWAY) return new Walkway();
 	if (type == PA_MERRY_GO_ROUND) return new MerryGoRound();
 	if (type == PA_ROLLER_COASTER) return new RollerCoaster();
-	if (type == PA_BUSH) return new Bush();
+	if (type == PA_TREE) return new Tree();
 	if (type == PA_HORROR_HOUSE) return new HorrorHouse();
 	if (type == PA_CRAZY_LAND) return new CrazyLand();
 	if (type == PA_INFORMATION_CENTER) return new InformationCenter();
 	if (type == PA_PUBLIC_RESTROOMS) return new PublicRestrooms();
-	if (type == PA_WATER_FOUNTAIN) return new InformationCenter();
+	if (type == PA_WATER_FOUNTAIN) return new WaterFountain();
 	if (type == PA_MERCHANDISE_STORE) return new MerchandiseStore();
 	if (type == PA_JUNGLE_GYM) return new JungleGym();
 	if (type == PA_PARK_BENCH) return new ParkBench();
