@@ -104,8 +104,6 @@ public:
 
 		time_in_simulation += update_speed;
 
-		std::cout << ".";
-
 		//
 		// ADD/REMOVE VISITORS
 		//

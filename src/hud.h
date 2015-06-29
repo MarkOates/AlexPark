@@ -77,7 +77,7 @@ public:
 
 		al_draw_text(font, al_color_name("yellow"), x+padding_x, y+padding_y, 0, title.c_str());
 
-		al_draw_multiline_text(font, al_color_name("white"), x+padding_x, y+padding_y + 30, w-20, al_get_font_line_height(font)-padding_x*2, 0, message.c_str());
+		al_draw_multiline_text(font, al_color_name("white"), x+padding_x, y+padding_y + 40, w-padding_x*2, al_get_font_line_height(font)-padding_x*2, 0, message.c_str());
 		al_draw_text(font, al_color_name("yellowgreen"), x+w, y+h, ALLEGRO_ALIGN_RIGHT, "PRESS ANY KEY");
 	}
 };

@@ -310,7 +310,6 @@ public:
 			return;
 		}
 
-		std::cout << hud.hovered_ui_id << std::endl;
 		hud.activate_ui(hud.hovered_ui_id);
 		
 		if (ground_x < 0 || ground_y < 0) return;
