@@ -5,7 +5,7 @@
 
 void draw_dialogue_frame(int x, int y, int w, int h)
 {
-	al_draw_filled_rectangle(x, y, x+w, y+h, al_map_rgba_f(0.2, 0.2, 0.2, 0.4));
+	al_draw_filled_rectangle(x, y, x+w, y+h, al_map_rgba_f(0.2, 0.2, 0.2, 0.8));
 }
 
 
@@ -53,8 +53,34 @@ ALLEGRO_BITMAP *generate_asset_bitmap(ParkAsset *asset, ALLEGRO_FONT *icons_big)
 
 
 
+class Dialogue
+{
+public:
+	std::string message;
+	std::string title;
+	ALLEGRO_FONT *font;
+	int x, y, w, h;
+	Dialogue(std::string title, std::string message, ALLEGRO_FONT *font)
+		: message(message)
+		, title(title)
+		, font(font)
+		, x(200)
+		, y(200)
+		, w(500)
+		, h(250)
+	{}
+	void draw()
+	{
+		int padding_x = 30;
+		int padding_y = 20;
+		draw_dialogue_frame(x, y, w, h);
 
+		al_draw_text(font, al_color_name("yellow"), x+padding_x, y+padding_y, 0, title.c_str());
 
+		al_draw_multiline_text(font, al_color_name("white"), x+padding_x, y+padding_y + 30, w-20, al_get_font_line_height(font)-padding_x*2, 0, message.c_str());
+		al_draw_text(font, al_color_name("yellowgreen"), x+w, y+h, ALLEGRO_ALIGN_RIGHT, "PRESS ANY KEY");
+	}
+};
 
 
 
@@ -77,6 +103,33 @@ public:
 	int hovered_ui_id;
 
 	bool asset_window_visible;
+
+
+
+
+	std::deque<Dialogue> dialogues;
+
+	void spawn_dialogue(std::string title, std::string message)
+	{
+		dialogues.push_back(Dialogue(title, message, font));
+	}
+
+	bool dialogue_is_open()
+	{
+		return !dialogues.empty();
+	}
+
+	bool close_dialogue()
+	{
+		if (!dialogues.empty())
+		{
+			dialogues.pop_front();
+			return true;
+		}
+		return false;
+	}
+
+
 
 
 	HUD(ALLEGRO_DISPLAY *display, ALLEGRO_BITMAP *pointer_target_buffer, Park *park)
@@ -194,6 +247,9 @@ public:
 
 
 		if (asset_window_visible) draw_asset_selection_window(draw_id);
+
+
+		if (dialogue_is_open()) dialogues.front().draw();
 		// draw the assets_menu
 	}
 	ParkAsset *get_current_selected_asset()

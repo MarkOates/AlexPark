@@ -11,6 +11,7 @@
 #include <vector>
 #include <iostream>
 #include <algorithm>
+#include <deque>
 
 #define TAU (ALLEGRO_PI * 2)
 
@@ -40,13 +41,40 @@ void draw_ustr_chr(int32_t ustr_char, float x, float y, float align_x, float ali
 #include "vec3d.h"
 #include "park_asset.h"
 #include "heat_map.h"
+#include "achievement.h"
 #include "park.h"
 #include "hud.h"
 #include "ground.h"
 #include "camera.h"
+#include "achievements.h"
 
 
+Achievement::Achievement(Park &park, HUD &hud)
+	: name("[achievement_name]")
+	, achieved(false)
+	, achievement_message("[achievement_message]")
+	, park(park)
+	, hud(hud)
+{}
 
+void Achievement::check_update()
+{
+	if (achieved) return;
+	bool achieved = test_condition();
+	if (achieved) on_achieved();
+}
+
+bool Achievement::test_condition() 
+{
+	return false;
+}
+
+bool Achievement::on_achieved()
+{
+	// spawn a dialogue
+	hud.spawn_dialogue("Achievement Unlocked!", achievement_message.c_str());
+	// unlock some thing that is currently locked
+}
 
 
 
@@ -95,6 +123,8 @@ public:
 		{
 			park.purchase_asset(hud.get_current_selected_asset(), 16, 16);
 		}
+
+		hud.spawn_dialogue("Hello!", "Welcome to the park.");
 	}
 
 	void refresh_ground_render_surface()
@@ -117,17 +147,19 @@ public:
 //				al_draw_filled_circle(x * x_scale, y * y_scale, 1, al_color_name("black"));
 
 		// draw the cursor
-		if (ground_x >= 0)
+		if (!hud.dialogue_is_open())
 		{
-			
-			al_draw_circle(ground_x * x_scale + x_scale/2, ground_y * y_scale + x_scale/2,
-				16, al_map_rgba_f(0.1, 0.1, 0.1, 0.1), 3.0);
-			al_draw_rectangle(ground_x * x_scale, ground_y * y_scale,
-				ground_x * x_scale + x_scale, ground_y * y_scale + y_scale,
-				al_color_name("orange"), 3);
-			//al_draw_filled_rectangle(ground_x * x_scale, ground_y * y_scale,
-			//	ground_x * x_scale + x_scale, ground_y * y_scale + y_scale,
-			//	al_color_name("yellow"));
+			if (ground_x >= 0)
+			{
+				al_draw_circle(ground_x * x_scale + x_scale/2, ground_y * y_scale + x_scale/2,
+					16, al_map_rgba_f(0.1, 0.1, 0.1, 0.1), 3.0);
+				al_draw_rectangle(ground_x * x_scale, ground_y * y_scale,
+					ground_x * x_scale + x_scale, ground_y * y_scale + y_scale,
+					al_color_name("orange"), 3);
+				//al_draw_filled_rectangle(ground_x * x_scale, ground_y * y_scale,
+				//	ground_x * x_scale + x_scale, ground_y * y_scale + y_scale,
+				//	al_color_name("yellow"));
+			}
 		}
 
 		// draw the nice eyecandy shadows
@@ -148,7 +180,7 @@ public:
 		// update the park
 		//
 
-		park.update();
+		if (!hud.dialogue_is_open()) park.update();
 
 
 		//
@@ -213,6 +245,12 @@ public:
 	}
 	void on_key_char(ALLEGRO_EVENT &ev)
 	{
+		if (hud.dialogue_is_open())
+		{
+			hud.close_dialogue();
+			return;
+		}
+
 		switch(ev.keyboard.keycode)
 		{
 			case ALLEGRO_KEY_RIGHT:
@@ -236,7 +274,7 @@ public:
 			case ALLEGRO_KEY_EQUALS:
 				park.money += 1000;
 				break;
-			case ALLEGRO_KEY_ENTER:
+			case ALLEGRO_KEY_F1:
 				// this will save a bitmap of the pointer_target_buffer,
 				// which is the bitmap used to ditermine what object
 				// the mouse is pointing at
@@ -257,6 +295,12 @@ public:
 	void on_mouse_up() {}
 	void on_mouse_down()
 	{
+		if (hud.dialogue_is_open())
+		{
+			hud.close_dialogue();
+			return;
+		}
+
 		std::cout << hud.hovered_ui_id << std::endl;
 		hud.activate_ui(hud.hovered_ui_id);
 		
