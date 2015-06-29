@@ -302,6 +302,7 @@ public:
 			opened_window_first_time = true;
 			spawn_dialogue("These Are Assets You Can Build.", "Right now only have a few things you can build, so there's not a lot to choose from. But, as your park grows you'll be able to build more things.", 0xf0a1);
 			spawn_dialogue("These Are Assets You Can Build.", "Each item costs an amount of money to build.  And each item has certain advantages and disadvantages.", 0xf0a1);
+			spawn_dialogue("These Are Assets You Can Build.", "Keep in mind, though. When all assets are permanent.  You won't be able to remove it once it's built.", 0xf0a1);
 			spawn_dialogue("These Are Assets You Can Build.", "Let's start simple.  Your goal is to earn money and get people into your park.  BUILD A CONCESSION STAND so we can start generating some income.", 0xf0a1);
 		}
 		asset_window_visible = !asset_window_visible;

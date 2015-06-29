@@ -278,10 +278,10 @@ public:
 			case ALLEGRO_KEY_DOWN:
 				camera.position.z++;
 				break;
-			case ALLEGRO_KEY_PAD_PLUS:
+			case ALLEGRO_KEY_PAD_RIGHT_BRACE:
 				camera.zoom_pos += 0.1;
 				break;
-			case ALLEGRO_KEY_PAD_MINUS:
+			case ALLEGRO_KEY_PAD_LEFT_BRACE:
 				camera.zoom_pos -= 0.1;
 				break;
 			case ALLEGRO_KEY_EQUALS:
@@ -363,7 +363,7 @@ int main(int argc, char* argv[])
 
 	while (!project.abort_game)
 	{
-		ALLEGRO_EVENT current_event;
+		ALLEGRO_EVENT current_event, next_event;
 		al_wait_for_event(event_queue, &current_event);
 
 		switch(current_event.type)
@@ -371,6 +371,10 @@ int main(int argc, char* argv[])
 		case ALLEGRO_EVENT_TIMER:
 			project.on_timer(current_event);
 			al_flip_display();
+			while (al_peek_next_event(event_queue, &next_event)
+				&& next_event.type == ALLEGRO_EVENT_TIMER
+				&& next_event.timer.source == current_event.timer.source)
+					al_drop_next_event(event_queue);
 			break;
 		case ALLEGRO_EVENT_KEY_CHAR:
 			project.on_key_char(current_event);

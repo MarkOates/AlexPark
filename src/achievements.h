@@ -122,7 +122,7 @@ public:
 		: Achievement(park, hud)
 	{
 		name = ACH_PUBLIC_RESTROOMS;
-		achievement_message = "Yikes!  Everyone seems to enjoying this place, but they aren't staying for very long.  All this food and drink, and nowhere to go.  You unlocked PUBLIC RESTROOMS.";
+		achievement_message = "Yikes!  Everyone seems to enjoying this place, but they aren't staying for very long.  All this food and drink, and nowhere to 'go'.  You unlocked PUBLIC RESTROOMS.";
 	}
 	bool test_condition() override
 	{
