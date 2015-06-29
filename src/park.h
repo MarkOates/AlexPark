@@ -50,6 +50,8 @@ public:
 	float update_speed;
 	float update_counter;
 
+	float time_in_simulation;
+
 	Park()
 		: money(1000)
 		, visitor_happiness(0)
@@ -59,6 +61,7 @@ public:
 		, traffic_map()
 		, update_counter(1)
 		, update_speed(0.005)
+		, time_in_simulation(0)
 	{
 		for (int y=0; y<32; y++)
 			for (int x=0; x<32; x++)
@@ -98,6 +101,8 @@ public:
 		update_counter -= update_speed;
 		if (update_counter <= 0) update_counter = 1.0;
 		else return;
+
+		time_in_simulation += update_speed;
 
 		std::cout << ".";
 

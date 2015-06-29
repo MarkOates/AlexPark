@@ -57,11 +57,16 @@ Achievement::Achievement(Park &park, HUD &hud)
 	, hud(hud)
 {}
 
-void Achievement::check_update()
+bool Achievement::check_update()
 {
-	if (achieved) return;
-	bool achieved = test_condition();
-	if (achieved) on_achieved();
+	if (achieved) return false;
+	achieved = test_condition();
+	if (achieved)
+	{
+		on_achieved();
+		return true;
+	}
+	return false;
 }
 
 bool Achievement::test_condition() 
@@ -180,7 +185,11 @@ public:
 		// update the park
 		//
 
-		if (!hud.dialogue_is_open()) park.update();
+		if (!hud.dialogue_is_open())
+		{
+			park.update();
+			hud.test_achievements();
+		}
 
 
 		//

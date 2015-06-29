@@ -4,13 +4,13 @@
 
 
 
-class YourFirstVisitor : public Achievement
+class FirstVisitor : public Achievement
 {
 public:
-	YourFirstVisitor(Park &park, HUD &hud)
+	FirstVisitor(Park &park, HUD &hud)
 		: Achievement(park, hud)
 	{
-		name = "First Visitor";
+		name = ACH_FIRST_VISITOR;
 		achievement_message = "Congratulations! Your first visitor has arrived.  What a momentus day!";
 	}
 	bool test_condition() override
@@ -18,10 +18,19 @@ public:
 		if (park.visitors.size() > 0) return true;
 		return false;
 	}
-	bool on_achieved() override
-	{
-	}
 };
+
+
+
+
+Achievement *FACTORY_create_achievement(std::string achievement_name, Park &park, HUD &hud)
+{
+	if (achievement_name == ACH_FIRST_VISITOR)
+		return new FirstVisitor(park, hud);
+	
+	std::cerr << "Could not create an achievement for \"" << achievement_name << "\"" << std::endl;
+	return NULL;
+}
 
 
 

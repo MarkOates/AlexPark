@@ -106,6 +106,9 @@ public:
 
 
 
+	std::vector<Achievement *> all_achievements;
+
+
 
 	std::deque<Dialogue> dialogues;
 
@@ -146,6 +149,8 @@ public:
 		, asset_icons()
 		, hovered_ui_id(-1)
 		, asset_window_visible(false)
+		, all_achievements()
+		, dialogues()
 	{
 		if (!font || !icons) std::cerr << "AAHGFHGHGHGHG (no fonts found)" << std::endl;
 
@@ -171,6 +176,15 @@ public:
 		// generate our asset icons
 		for (unsigned i=0; i<all_assets.size(); i++)
 			asset_icons[all_assets[i]->type] = generate_asset_bitmap(all_assets[i], icons_big);
+
+		// build our list of achievements
+		all_achievements.push_back(FACTORY_create_achievement(ACH_FIRST_VISITOR, *park, *this));
+	}
+
+	void test_achievements()
+	{
+		for (unsigned i=0; i<all_achievements.size(); i++)
+			if (all_achievements[i]->check_update()) return;
 	}
 
 	bool set_selected_asset_by_type(std::string asset_type)
