@@ -325,7 +325,7 @@ public:
 #define PA_PUBLIC_RESTROOMS "Public Restrooms"
 #define PA_WATER_FOUNTAIN "Water Fountain"
 #define PA_MERCHANDISE_STORE "Merchandise Store"
-#define PA_JUNGLE_GYM "Jugle Gym"
+#define PA_JUNGLE_GYM "Jungle Gym"
 #define PA_PARK_BENCH "Park Bench"
 #define PA_FERRIS_WHEEL "Ferris Wheel"
 #define PA_ALEX_STATUE "Alex Statue"
@@ -366,9 +366,9 @@ public:
 	{
 		type = PA_WALKWAY;
 		texture = NULL;
-		color = al_color_name("green");
-		icon_char = 0xf018;
-		icon_color = al_color_name("gray");
+		color = al_color_name("darkolivegreen");
+		icon_char = 0xf0c8;
+		icon_color = al_color_name("darkgray");
 
 		initial_cost = 0;
 
@@ -445,7 +445,7 @@ public:
 		icon_char = 0xf1bb;
 		icon_color = al_color_html("6ba342");
 
-		initial_cost = 100;
+		initial_cost = 50;
 
 		expense_per_turn = 0;
 		max_num_customers_served = 1;
@@ -589,12 +589,12 @@ public:
 		texture = NULL;
 		color = al_color_name("blue");
 
-		initial_cost = 5000;
+		initial_cost = 3000;
 
 		expense_per_turn = 0;
 		max_num_customers_served = 5;
 		customer_happiness_created = 1;
-		profit = 5;
+		profit = 7;
 		num_customers_brought_to_park = 5;
 	}
 };

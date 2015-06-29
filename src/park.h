@@ -39,6 +39,7 @@ class Park // this is basically the Player
 public:
 	int money;
 	float visitor_happiness;
+	float visitor_boredom;
 	float customer_attraction;
 
 	std::vector<ParkAsset *> assets;
@@ -55,12 +56,14 @@ public:
 	Park()
 		: money(1000)
 		, visitor_happiness(0)
+		, visitor_boredom(0)
 		, assets()
 		, visitors()
 		, hovered_asset_id(0)
 		, traffic_map()
 		, update_counter(1)
-		, update_speed(0.005)
+		//, update_speed(0.01)
+		, update_speed(0.01)
 		, time_in_simulation(0)
 	{
 		for (int y=0; y<32; y++)
@@ -180,6 +183,20 @@ public:
 		{
 			money -= assets[i]->expense_per_turn;
 			money += assets[i]->profit * assets[i]->num_customers_served_this_turn;
+		}
+
+		// count visitor happiness
+		visitor_happiness = 0;
+		visitor_boredom = 0;
+		for (unsigned i=0; i<visitors.size(); i++)
+		{
+			visitor_happiness += visitors[i]->happiness;
+			visitor_boredom += visitors[i]->boredom;
+		}
+		if (!visitors.empty())
+		{
+			visitor_happiness /= visitors.size();
+			visitor_boredom /= visitors.size();
 		}
 	}
 

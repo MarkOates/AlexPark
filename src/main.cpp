@@ -35,7 +35,7 @@ void draw_ustr_chr(int32_t ustr_char, float x, float y, float align_x, float ali
 	al_ustr_free(ustr);
 }
 
-
+#include "motion.h"
 #include "color_encode_id.h"
 #include "assets.h"
 #include "vec3d.h"
@@ -64,6 +64,7 @@ bool Achievement::check_update()
 	if (achieved)
 	{
 		on_achieved();
+		hud.spawn_dialogue("Achievement Unlocked!", achievement_message.c_str(), 0xf091, al_color_name("gold"));
 		return true;
 	}
 	return false;
@@ -77,7 +78,6 @@ bool Achievement::test_condition()
 bool Achievement::on_achieved()
 {
 	// spawn a dialogue
-	hud.spawn_dialogue("Achievement Unlocked!", achievement_message.c_str());
 	// unlock some thing that is currently locked
 }
 
@@ -88,6 +88,7 @@ class Project
 public:
 	ALLEGRO_DISPLAY *display;
 	ALLEGRO_BITMAP *pointer_target_buffer;
+	Motion motion;
 	Camera camera;
 	Park park;
 	HUD hud;
@@ -106,9 +107,10 @@ public:
 	Project(ALLEGRO_DISPLAY *display)
 		: display(display)
 		, pointer_target_buffer(al_create_bitmap(al_get_display_width(display), al_get_display_height(display)))
+		, motion()
 		, camera(0, 0, 0)
 		, park()
-		, hud(display, pointer_target_buffer, &park)
+		, hud(display, pointer_target_buffer, &park, motion)
 		, abort_game(false)
 		, texture(al_load_bitmap("data/bitmaps/stone.png"))
 		, ground(32, 32)
@@ -126,10 +128,12 @@ public:
 		camera.position.y -= 10;
 		for (unsigned i=0; i<1; i++)
 		{
-			park.purchase_asset(hud.get_current_selected_asset(), 16, 16);
+			//park.purchase_asset(hud.get_current_selected_asset(), 16, 16);
 		}
 
-		hud.spawn_dialogue("Hello!", "Welcome to the park.");
+		hud.spawn_dialogue("Welcome to Your Park!", "What an exciting time to be a business person.  You've been given this plot of land and have been granted a permit to create a park.", 0xf15b);
+		hud.spawn_dialogue("Welcome to Your Park!", "But right now, there's nobody here!  It's just an empty plot.  So let's start by building something to see if we can get people interested in coming.", 0xf0a1);
+		hud.spawn_dialogue("Welcome to Your Park!", "To start, click the icon on the bottom right.  This will open up your ASSETS window.  There's not a lot there to build with, yet, but it's a start.", 0xf0a1);
 	}
 
 	void refresh_ground_render_surface()
@@ -145,11 +149,16 @@ public:
 
 		al_draw_bitmap(grass_texture, 0, 0, 0);
 
-		// draw the stone_walkways
-
-//		for (unsigned y=0; y<ground.h; y++)
-//			for (unsigned x=0; x<ground.w; x++)
-//				al_draw_filled_circle(x * x_scale, y * y_scale, 1, al_color_name("black"));
+		// draw the nice eyecandy shadows and stone_walkways
+		for (unsigned i=0; i<park.assets.size(); i++)
+		{
+			int x = park.assets[i]->position.x * x_scale;
+			int y = park.assets[i]->position.z * y_scale;
+			if (park.assets[i]->type == PA_WALKWAY)
+				al_draw_bitmap(stone_walkway, x, y, 0);
+			else
+				al_draw_bitmap(asset_plot_shadow, x-16, y-16, 0);
+		}
 
 		// draw the cursor
 		if (!hud.dialogue_is_open())
@@ -167,20 +176,15 @@ public:
 			}
 		}
 
-		// draw the nice eyecandy shadows
-		for (unsigned i=0; i<park.assets.size(); i++)
-		{
-			int x = park.assets[i]->position.x * x_scale;
-			int y = park.assets[i]->position.z * y_scale;
-			al_draw_bitmap(asset_plot_shadow, x-16, y-16, 0);
-		}
-
 		al_restore_state(&previous_state);
 		al_set_render_state(ALLEGRO_DEPTH_TEST, 1);
 	}
 
-	void on_timer()
+	void on_timer(ALLEGRO_EVENT &ev)
 	{
+		// update the motion manager
+		motion.update(ev.timer.timestamp);
+
 		//
 		// update the park
 		//
@@ -310,6 +314,12 @@ public:
 			return;
 		}
 
+		if (park.hovered_asset_id == 60000)
+		{
+			hud.toggle_asset_window();
+			return;
+		}
+
 		hud.activate_ui(hud.hovered_ui_id);
 		
 		if (ground_x < 0 || ground_y < 0) return;
@@ -359,7 +369,7 @@ int main(int argc, char* argv[])
 		switch(current_event.type)
 		{
 		case ALLEGRO_EVENT_TIMER:
-			project.on_timer();
+			project.on_timer(current_event);
 			al_flip_display();
 			break;
 		case ALLEGRO_EVENT_KEY_CHAR:
