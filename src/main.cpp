@@ -278,10 +278,10 @@ public:
 			case ALLEGRO_KEY_DOWN:
 				camera.position.z++;
 				break;
-			case ALLEGRO_KEY_PAD_RIGHT_BRACE:
+			case ALLEGRO_KEY_OPENBRACE:
 				camera.zoom_pos += 0.1;
 				break;
-			case ALLEGRO_KEY_PAD_LEFT_BRACE:
+			case ALLEGRO_KEY_CLOSEBRACE:
 				camera.zoom_pos -= 0.1;
 				break;
 			case ALLEGRO_KEY_EQUALS:
