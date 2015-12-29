@@ -25,6 +25,6 @@ You can download binaries for Windows at the official release thread on allegro.
 Build
 -----
 
-To build, you'll need Allegro 5.1.11.  A makefile is provided, but you will need to modify it to point to your current install of allegro.
+To build, you'll need at least Allegro 5.1.11.  A `Makefile` is provided, but you will need to modify the `ALLEGRO_DIR` to point to your current install of allegro.
 
 
