@@ -88,6 +88,11 @@ public:
    {
       return find("skip_tutorial_dialogs");
    }
+
+   bool screen_hd_resolution()
+   {
+      return find("hd");
+   }
 };
 
 
@@ -346,6 +351,9 @@ public:
 
 int main(int argc, char* argv[])
 {
+   Args args;
+   args.set(argc, argv);
+
    al_init();
 
    al_init_primitives_addon();
@@ -365,15 +373,22 @@ int main(int argc, char* argv[])
    // create the display
    al_set_new_display_option(ALLEGRO_DEPTH_SIZE, 32, ALLEGRO_SUGGEST);
    al_set_new_display_option(ALLEGRO_SUPPORT_NPOT_BITMAP, 0, ALLEGRO_REQUIRE);
-   ALLEGRO_DISPLAY *display = al_create_display(1920, 1080);
+
+   int resolution_x = 1200;
+   int resolution_y = 800;
+
+   if (args.screen_hd_resolution())
+   {
+      resolution_x = 1920;
+      resolution_y = 1080;
+   }
+
+   ALLEGRO_DISPLAY *display = al_create_display(resolution_x, resolution_y);
 
    al_register_event_source(event_queue, al_get_timer_event_source(timer));
    al_register_event_source(event_queue, al_get_mouse_event_source());   
    al_register_event_source(event_queue, al_get_keyboard_event_source());   
    al_register_event_source(event_queue, al_get_display_event_source(display));   
-
-   Args args;
-   args.set(argc, argv);
 
    Project project(display, args);
    al_start_timer(timer);
