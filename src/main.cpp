@@ -374,6 +374,7 @@ int main(int argc, char* argv[])
 
    Args args;
    args.set(argc, argv);
+
    Project project(display, args);
    al_start_timer(timer);
 
