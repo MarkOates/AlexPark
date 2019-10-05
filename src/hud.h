@@ -338,7 +338,7 @@ public:
 			ALLEGRO_COLOR color = al_color_name("white");
 
 			al_draw_filled_rounded_rectangle(10, 10, 350, 60, 16, 12, al_map_rgba_f(0, 0, 0, 0.2));
-			al_draw_textf(font, color, 40, 20, 0, "visitors: %d", park.visitors.size());	
+			al_draw_textf(font, color, 40, 20, 0, "visitors: %d", (int)park.visitors.size());
 			al_draw_textf(font, color, 200, 20, 0, "$ %d", park.money);
 			
 			al_draw_filled_rounded_rectangle(al_get_display_width(display)-350, 10, al_get_display_width(display)-10, 60, 16, 12, al_map_rgba_f(0, 0, 0, 0.2));
