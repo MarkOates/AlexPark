@@ -86,7 +86,7 @@ public:
 
    bool skip_dialogs()
    {
-      return find("skip_dialogs");
+      return find("skip_tutorial_dialogs");
    }
 };
 
