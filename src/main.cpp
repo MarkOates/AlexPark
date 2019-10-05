@@ -16,25 +16,6 @@
 #define TAU (ALLEGRO_PI * 2)
 
 
-void draw_ustr_chr(int32_t ustr_char, float x, float y, float align_x, float align_y, ALLEGRO_COLOR color, ALLEGRO_FONT *font, bool shaded = true)
-{
-   if (!font) return;
-   ALLEGRO_USTR *ustr = al_ustr_new("");
-   al_ustr_set_chr(ustr, 0, ustr_char);
-   if (shaded)
-   al_draw_ustr(font, al_map_rgba_f(0, 0, 0, 0.3),
-      x - al_get_ustr_width(font, ustr) * align_x + 2,
-      y - al_get_font_line_height(font) * align_y + 3,
-      0,
-      ustr); 
-   al_draw_ustr(font, color,
-      x - al_get_ustr_width(font, ustr) * align_x,
-      y - al_get_font_line_height(font) * align_y,
-      0,
-      ustr); 
-   al_ustr_free(ustr);
-}
-
 #include "motion.h"
 #include "color_encode_id.h"
 #include "assets.h"
