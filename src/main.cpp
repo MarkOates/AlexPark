@@ -97,6 +97,7 @@ class Project
 public:
    ALLEGRO_DISPLAY *display;
    ALLEGRO_BITMAP *pointer_target_buffer;
+   Args args;
    Motion motion;
    Camera camera;
    Park park;
@@ -113,9 +114,10 @@ public:
    ALLEGRO_BITMAP *grass_texture;
    ALLEGRO_BITMAP *stone_walkway;
 
-   Project(ALLEGRO_DISPLAY *display)
+   Project(ALLEGRO_DISPLAY *display, Args args)
       : display(display)
       , pointer_target_buffer(al_create_bitmap(al_get_display_width(display), al_get_display_height(display)))
+      , args(args)
       , motion()
       , camera(0, 0, 0)
       , park()
@@ -140,9 +142,12 @@ public:
          //park.purchase_asset(hud.get_current_selected_asset(), 16, 16);
       }
 
-      hud.spawn_dialogue("Welcome to Your Park!", "What an exciting time to be a business person.  You've been given this plot of land and have been granted a permit to create a park.", 0xf15b);
-      hud.spawn_dialogue("Welcome to Your Park!", "But right now, there's nobody here!  It's just an empty plot.  So let's start by building something to see if we can get people interested in coming.", 0xf0a1);
-      hud.spawn_dialogue("Welcome to Your Park!", "To start, click the icon on the bottom right.  This will open up your ASSETS window.  There's not a lot there to build with, yet, but it's a start.", 0xf0a1);
+      if (!args.skip_dialogs())
+      {
+         hud.spawn_dialogue("Welcome to Your Park!", "What an exciting time to be a business person.  You've been given this plot of land and have been granted a permit to create a park.", 0xf15b);
+         hud.spawn_dialogue("Welcome to Your Park!", "But right now, there's nobody here!  It's just an empty plot.  So let's start by building something to see if we can get people interested in coming.", 0xf0a1);
+         hud.spawn_dialogue("Welcome to Your Park!", "To start, click the icon on the bottom right.  This will open up your ASSETS window.  There's not a lot there to build with, yet, but it's a start.", 0xf0a1);
+      }
    }
 
    void refresh_ground_render_surface()
@@ -367,7 +372,9 @@ int main(int argc, char* argv[])
    al_register_event_source(event_queue, al_get_keyboard_event_source());   
    al_register_event_source(event_queue, al_get_display_event_source(display));   
 
-   Project project(display);
+   Args args;
+   args.set(argc, argv);
+   Project project(display, args);
    al_start_timer(timer);
 
    while (!project.abort_game)
