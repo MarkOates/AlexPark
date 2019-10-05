@@ -64,6 +64,34 @@ void Achievement::on_achieved()
 
 
 
+class Args
+{
+private:
+   std::vector<std::string> args;
+
+   bool find(std::string string)
+   {
+      return std::find(args.begin(), args.end(), string) != args.end();
+   }
+
+public:
+   Args()
+      : args{}
+   {}
+
+   void set(int argc, char **argv)
+   {
+      for (int i=0; i<argc; i++) args.push_back(argv[i]);
+   }
+
+   bool skip_dialogs()
+   {
+      return find("skip_dialogs");
+   }
+};
+
+
+
 class Project
 {
 public:
