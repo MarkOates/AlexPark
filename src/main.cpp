@@ -351,7 +351,7 @@ int main(int argc, char* argv[])
    // create the display
    al_set_new_display_option(ALLEGRO_DEPTH_SIZE, 32, ALLEGRO_SUGGEST);
    al_set_new_display_option(ALLEGRO_SUPPORT_NPOT_BITMAP, 0, ALLEGRO_REQUIRE);
-   ALLEGRO_DISPLAY *display = al_create_display(1200, 800);
+   ALLEGRO_DISPLAY *display = al_create_display(1920, 1080);
 
    al_register_event_source(event_queue, al_get_timer_event_source(timer));
    al_register_event_source(event_queue, al_get_mouse_event_source());   
