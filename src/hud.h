@@ -159,6 +159,7 @@ public:
 	ALLEGRO_FONT *icons, *icons_big;
 	Park &park;
 	Motion &motion;
+   bool skip_tutorial_dialogs;
 
 	int park_asset_index_selected_on_menu;
 	std::vector<ParkAsset *> all_assets;
@@ -211,7 +212,7 @@ public:
 
 
 
-	HUD(ALLEGRO_DISPLAY *display, ALLEGRO_BITMAP *pointer_target_buffer, Park *park, Motion &motion)
+	HUD(ALLEGRO_DISPLAY *display, ALLEGRO_BITMAP *pointer_target_buffer, Park *park, Motion &motion, bool skip_tutorial_dialogs=false)
 		: display(display)
 		, hud_overlay(al_create_sub_bitmap(al_get_backbuffer(display), 0, 0, al_get_display_width(display), al_get_display_height(display)))
 		, hud_overlay_pointer_target_buffer(al_create_sub_bitmap(pointer_target_buffer, 0, 0, al_get_bitmap_width(pointer_target_buffer), al_get_bitmap_height(pointer_target_buffer)))
@@ -230,6 +231,7 @@ public:
 		, all_achievements()
 		, dialogues()
 		, opened_window_first_time(false)
+		, skip_tutorial_dialogs(skip_tutorial_dialogs)
 	{
 		if (!font || !icons) std::cerr << "AAHGFHGHGHGHG (no fonts found)" << std::endl;
 
@@ -315,7 +317,7 @@ public:
 
 	void toggle_asset_window()
 	{
-		if (!opened_window_first_time)
+		if (!skip_tutorial_dialogs && !opened_window_first_time)
 		{
 			opened_window_first_time = true;
 			spawn_dialogue("These Are Assets You Can Build.", "Right now only have a few things you can build, so there's not a lot to choose from. But, as your park grows you'll be able to build more things.", 0xf0a1);
