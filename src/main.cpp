@@ -56,7 +56,7 @@ bool Achievement::test_condition()
    return false;
 }
 
-bool Achievement::on_achieved()
+void Achievement::on_achieved()
 {
    // spawn a dialogue
    // unlock some thing that is currently locked

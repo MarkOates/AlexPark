@@ -709,4 +709,6 @@ ParkAsset *FACTORY_create_asset(std::string type)
 	if (type == PA_ALEX_STATUE) return new AlexStatue();
 
 	std::cerr << "Cannot create new ParkAsset of type \"" << type << "\"" << std::endl;
+
+   return nullptr;
 }

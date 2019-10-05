@@ -36,7 +36,7 @@ public:
 		if (park.visitors.size() >= 15) return true;
 		return false;
 	}
-	bool on_achieved() override
+	void on_achieved() override
 	{
 		hud.all_assets.push_back(FACTORY_create_asset(PA_PARK_BENCH));
 		hud.all_assets.push_back(FACTORY_create_asset(PA_JUNGLE_GYM));
@@ -60,7 +60,7 @@ public:
 		if (park.visitors.size() >= 20) return true;
 		return false;
 	}
-	bool on_achieved() override
+	void on_achieved() override
 	{
 		hud.all_assets.push_back(FACTORY_create_asset(PA_WATER_FOUNTAIN));
 	}
@@ -84,7 +84,7 @@ public:
 		if (park.visitors.size() >= 30) return true;
 		return false;
 	}
-	bool on_achieved() override
+	void on_achieved() override
 	{
 		hud.all_assets.push_back(FACTORY_create_asset(PA_MERRY_GO_ROUND));
 	}
@@ -106,7 +106,7 @@ public:
 		if (park.visitors.size() >= 50) return true;
 		return false;
 	}
-	bool on_achieved() override
+	void on_achieved() override
 	{
 		hud.all_assets.push_back(FACTORY_create_asset(PA_INFORMATION_CENTER));
 	}
@@ -129,7 +129,7 @@ public:
 		if (park.visitors.size() >= 60) return true;
 		return false;
 	}
-	bool on_achieved() override
+	void on_achieved() override
 	{
 		hud.all_assets.push_back(FACTORY_create_asset(PA_PUBLIC_RESTROOMS));
 	}
@@ -153,7 +153,7 @@ public:
 		if (park.visitors.size() >= 100) return true;
 		return false;
 	}
-	bool on_achieved() override
+	void on_achieved() override
 	{
 		hud.all_assets.push_back(FACTORY_create_asset(PA_MERCHANDISE_STORE));
 	}
@@ -176,7 +176,7 @@ public:
 		if (park.visitors.size() >= 200) return true;
 		return false;
 	}
-	bool on_achieved() override
+	void on_achieved() override
 	{
 		hud.all_assets.push_back(FACTORY_create_asset(PA_CRAZY_LAND));
 	}
@@ -199,7 +199,7 @@ public:
 		if (park.visitors.size() >= 300) return true;
 		return false;
 	}
-	bool on_achieved() override
+	void on_achieved() override
 	{
 		hud.all_assets.push_back(FACTORY_create_asset(PA_HORROR_HOUSE));
 	}
@@ -222,7 +222,7 @@ public:
 		if (park.visitors.size() >= 500) return true;
 		return false;
 	}
-	bool on_achieved() override
+	void on_achieved() override
 	{
 		hud.all_assets.push_back(FACTORY_create_asset(PA_ROLLER_COASTER));
 	}
@@ -245,7 +245,7 @@ public:
 		if (park.visitors.size() >= 800) return true;
 		return false;
 	}
-	bool on_achieved() override
+	void on_achieved() override
 	{
 		hud.all_assets.push_back(FACTORY_create_asset(PA_FERRIS_WHEEL));
 	}
@@ -267,7 +267,7 @@ public:
 		if (park.visitors.size() >= 1000) return true;
 		return false;
 	}
-	bool on_achieved() override
+	void on_achieved() override
 	{
 		hud.all_assets.push_back(FACTORY_create_asset(PA_ALEX_STATUE));
 	}

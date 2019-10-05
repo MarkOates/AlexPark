@@ -20,7 +20,7 @@ public:
 	bool check_update(); // returns true if the achievement was met during this check
 
 	bool virtual test_condition();
-	bool virtual on_achieved();
+	void virtual on_achieved();
 };
 
 
