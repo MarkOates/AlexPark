@@ -84,7 +84,7 @@ public:
       for (int i=0; i<argc; i++) args.push_back(argv[i]);
    }
 
-   bool skip_dialogs()
+   bool skip_tutorial_dialogs()
    {
       return find("skip_tutorial_dialogs");
    }
@@ -121,7 +121,7 @@ public:
       , motion()
       , camera(0, 0, 0)
       , park()
-      , hud(display, pointer_target_buffer, &park, motion)
+      , hud(display, pointer_target_buffer, &park, motion, args.skip_tutorial_dialogs())
       , abort_game(false)
       , texture(al_load_bitmap("data/bitmaps/stone.png"))
       , ground(32, 32)
@@ -142,7 +142,7 @@ public:
          //park.purchase_asset(hud.get_current_selected_asset(), 16, 16);
       }
 
-      if (!args.skip_dialogs())
+      if (!args.skip_tutorial_dialogs())
       {
          hud.spawn_dialogue("Welcome to Your Park!", "What an exciting time to be a business person.  You've been given this plot of land and have been granted a permit to create a park.", 0xf15b);
          hud.spawn_dialogue("Welcome to Your Park!", "But right now, there's nobody here!  It's just an empty plot.  So let's start by building something to see if we can get people interested in coming.", 0xf0a1);
